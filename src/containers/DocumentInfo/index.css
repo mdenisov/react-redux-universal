@@ -1,0 +1,14 @@
+.w {
+  padding: 20px;
+}
+
+.logo {
+  background: url('../../images/logo.gif');
+  width: 188px;
+  height: 32px;
+  margin-bottom: 1rem;
+}
+
+.caption {
+  font-size: 1rem !important;
+}
