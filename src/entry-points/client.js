@@ -52,24 +52,24 @@ match({ routes: createRoutes(instanceStore), location: requestUrl, basename: win
     </Router>
   );
 
-  let node;
-  if (__DEBUG__ && !window.devToolsExtension) {
-    const DevToolsView = require('../components/DevToolsView').default;
-    // Enable Redux dev tools in DEBUG mode
-    node = (
-      <Provider store={instanceStore.store}>
-        <div>
-          {routerInst}
-          <DevToolsView/>
-        </div>
-      </Provider>
-    );
-  } else {
-    node = (
-      <Provider store={instanceStore.store}>
-        {routerInst}
-      </Provider>
-    );
-  }
+  const node = (
+    <Provider store={instanceStore.store}>
+      {routerInst}
+    </Provider>
+  );
+
   ReactDOM.render(node, target);
+
+  if (__DEBUG__ && !window.devToolsExtension) {
+    // Enable Redux dev tools in DEBUG mode
+    const DevToolsView = require('../components/DevToolsView').default;
+    const devNode = (
+      <Provider store={instanceStore.store}>
+        <DevToolsView/>
+      </Provider>
+    );
+    const devTarget = document.createElement('div');
+    target.parentNode.insertBefore(devTarget, target.nextSibling);
+    ReactDOM.render(devNode, devTarget);
+  }
 });
