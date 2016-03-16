@@ -1,5 +1,4 @@
 import koa from 'koa';
-import serve from 'koa-static';
 import config from '../config';
 import bodyParser from 'koa-bodyparser';
 import path from 'path';
@@ -8,8 +7,8 @@ import renderRoute from './middleware/renderRoute';
 import router from './middleware/api';
 import compress from 'koa-compress';
 import favicon from 'koa-favicon';
+import send from 'koa-send';
 
-const paths = config.get('utils_paths');
 const globals = config.get('globals');
 const app = koa();
 
@@ -22,17 +21,33 @@ app.use(bodyParser());
 // Compress response
 app.use(compress());
 
-// Serve is favicon in dev mode, because in prod need serve of front server (apache, nginx, etc...)
+// Serve is statics in dev mode, because in prod need serve of front server (apache, nginx, etc...)
 if (globals.__DEV__) {
+  // Serve favicon
   app.use(favicon(path.join(config.get('path_project'), 'public/favicon.ico')));
+
+  // Serve function
+  const serveStatic = (root, opts = {}, baseName = '') => {
+    opts.root = path.resolve(root);
+    if (opts.index !== false) opts.index = opts.index || 'index.html';
+    return function *serve(next) {
+      if (this.method === 'HEAD' || this.method === 'GET') {
+        let servePath = this.path;
+        if (baseName.length &&
+            this.path.indexOf(baseName) === 0) {
+          servePath = this.path.substr(baseName.length);
+        }
+        if (yield send(this, servePath, opts)) return;
+      }
+      yield* next;
+    };
+  };
+
+  // Serve statics in public/client
+  app.use(serveStatic(config.get('path_project'), {
+    index: '__IGNORE_INDEX.HTML__',
+  }, config.get('project_public_path')));
 }
-
-// Share statics in public/client
-app.use(serve(paths.public('client'), {
-  index: '__IGNORE_INDEX.HTML__',
-}));
-
-app.use(serve(path.join(config.get('path_project'), 'public')));
 
 // Processing requests API
 app.use(router.routes());
