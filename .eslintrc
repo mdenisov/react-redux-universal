@@ -14,10 +14,7 @@
     "__CLIENT__" : false,
     "__SERVER__" : false,
     "__REDUX_LOGGER__" : false,
-    "__PROJECT_PATH__" : false,
-    "$" : false,
-    "xtag": false,
-    "bbXTag": false
+    "__PROJECT_PATH__" : false,    
   },
   "rules": {
     "no-script-url" : 0,
@@ -34,4 +31,3 @@
     }
   }
 }
-

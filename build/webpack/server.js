@@ -64,6 +64,14 @@ const webpackConfig = {
             'transform-react-jsx',
             'transform-regenerator',
           ],
+          env: {
+            production: {
+              plugins: [
+                'transform-react-remove-prop-types',
+                'transform-react-constant-elements',
+              ],
+            },
+          },
         },
       },
       {
@@ -91,6 +99,12 @@ if (globals.__PROD__) {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
   ];
+}
+
+if (globals.__DEV__) {
+  config.get('vendor_dependencies').forEach(dep => {
+    webpackConfig.plugins.push(new webpack.PrefetchPlugin(dep));
+  });
 }
 
 export default webpackConfig;

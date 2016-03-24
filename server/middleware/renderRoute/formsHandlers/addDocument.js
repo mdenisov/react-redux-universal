@@ -2,7 +2,7 @@ import { readFilePromise, writeFilePromise } from '../../../helpers/fs';
 import path from 'path';
 
 // Handler form AddDocument
-export default function* ({ requestFromFetchAPI }) {
+const handler = function* handler({ requestFromFetchAPI }) {
   const documentsJSON = yield readFilePromise(path.join(__dirname, '../../api', 'documents.json'));
   const documents = JSON.parse(documentsJSON);
   const maxID = parseInt(documents.documents.document[documents.documents.document.length - 1].id, 10);
@@ -19,4 +19,9 @@ export default function* ({ requestFromFetchAPI }) {
   } else {
     this.body = '';
   }
-}
+};
+
+export default {
+  formName: 'AddDocument',
+  handler,
+};

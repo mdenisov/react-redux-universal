@@ -16,6 +16,23 @@ export const createReducer = (initialState, reducerMap) => {
   };
 };
 
+const stringifyQuery = (query) => {
+  return qs.stringify(query, { arrayFormat: 'repeat' }).replace(/%20/g, '+');
+};
+const parsePath = path => {
+  if (typeof path === 'object') {
+    let queryString = '';
+    if (path.query) {
+      queryString = stringifyQuery(path.query);
+    }
+    if (queryString === '') {
+      return path.pathname;
+    }
+    return `${path.pathname}${path.pathname.indexOf('?') !== -1 ? '&' : '?'}${queryString}`;
+  }
+  return path;
+};
+
 /**
  * Добавляет методы assign, reload и replace в переданный объект location
  * (на сервере методы возвращают Promise.reject с первым параметром - 302 и вторым параметром - новым URL;
@@ -26,62 +43,63 @@ export const createReducer = (initialState, reducerMap) => {
  * @return {Object} location расширенный объект location
  */
 export const extendLocation = (() => {
-  const stringifyQuery = (query) => {
-    return qs.stringify(query, { arrayFormat: 'repeat' }).replace(/%20/g, '+');
-  };
-  const parseLocation = (_location) => {
-    if (typeof _location === 'object' && _location !== null) {
-      let queryString = '';
-      if (_location.query) {
-        queryString = stringifyQuery(_location.query);
-      }
-      if (queryString === '') {
-        return _location.path;
-      }
-      return `${_location.path}${_location.path.indexOf('?') !== -1 ? '&' : '?'}${queryString}`;
-    }
-    return _location;
-  };
-
   return (location) => {
     const newLocation = Object.assign({}, location);
     if (typeof window !== 'undefined') {
       newLocation.assign = path => {
-        window.location.assign(parseLocation(path));
+        window.location.assign(parsePath(path));
       };
       newLocation.reload = forceGet => {
         window.location.reload(forceGet);
       };
       newLocation.replace = path => {
-        window.location.replace(parseLocation(path));
+        window.location.replace(parsePath(path));
       };
     } else {
       newLocation.assign = path => {
-        return Promise.reject([302, parseLocation(path)]);
+        return Promise.reject([302, parsePath(path)]);
       };
       newLocation.reload = () => {
         return Promise.reject([302, `${location.pathname}${location.search}${location.hash}`]);
       };
       newLocation.replace = path => {
-        return Promise.reject([302, parseLocation(path)]);
+        return Promise.reject([302, parsePath(path)]);
       };
     }
     return newLocation;
   };
 })();
 
-export const fetchComponentData = ({ history, location = {}, dispatch, components, params }) => {
+const createRouter = history => {
+  return {
+    push: path => {
+      if (typeof window !== 'undefined') {
+        history.push(path);
+      }
+      return Promise.reject([302, parsePath(path)]);
+    },
+    replace: path => {
+      if (typeof window !== 'undefined') {
+        history.replace(path);
+      }
+      return Promise.reject([302, parsePath(path)]);
+    },
+  };
+};
+
+export const fetchComponentData = ({ history, location, dispatch, components, apiPath, params }) => {
+  const router = createRouter({ history });
   const newLocation = extendLocation(location);
   const fetchData = components.reduce((prev, current) => {
     if (current) {
-      return ((current.WrappedComponent ? current.WrappedComponent.fetchData : (current.fetchData || [])) || [])
+      return (current.WrappedComponent && Array.isArray(current.WrappedComponent.fetchData) ? current.WrappedComponent.fetchData : (current.fetchData || []))
         .concat(prev);
     }
     return prev;
   }, []);
 
   const promises = fetchData.map(need => {
-    return dispatch(need(Object.assign({}, params, { history, location: newLocation })));
+    return dispatch(need(Object.assign({}, params, { router, location: newLocation, apiPath })));
   });
 
   return Promise.all(promises);

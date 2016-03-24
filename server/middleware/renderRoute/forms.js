@@ -1,14 +1,20 @@
 import statuses from 'koa/node_modules/statuses';
 
 const formsHandlers = {};
-const addFormHandler = (formName, handler) => {
-  if (!formName) {
+const addFormHandler = (arg) => {
+  if (!arg.formName) {
     throw new Error(`FormName isn't valid`);
   }
-  if (!handler) {
+  if (!arg.handler) {
     throw new Error(`Handler form isn't valid`);
   }
-  formsHandlers[formName] = handler;
+  if (arg.validate && !arg.method) {
+    throw new Error(`Method form isn't valid`);
+  }
+  if (!arg.validate && arg.method) {
+    throw new Error(`Validate form isn't valid`);
+  }
+  formsHandlers[arg.formName] = arg;
 };
 
 const processingRequest = function* (middlProps) {
@@ -35,6 +41,16 @@ const processingRequest = function* (middlProps) {
       }
       return prev;
     }, []);
+    // Add to formValidate manual added validate func
+    Object.keys(formsHandlers).forEach(key => {
+      if (formsHandlers[key].validate) {
+        formValidate.push({
+          name: formsHandlers[key].formName,
+          method: formsHandlers[key].method,
+          validate: formsHandlers[key].validate,
+        });
+      }
+    });
     // Validate form data by methods formValidate
     for (let i = 0, l = formValidate.length; i < l; ++i) {
       const propValidate = formValidate[i];
@@ -54,17 +70,24 @@ const processingRequest = function* (middlProps) {
         const formErrors = propValidate.validate(this.request.body);
         // Errors are found
         if (Object.keys(formErrors).length) {
-          // FetchAPI request. Return HTTP code 450
-          if (requestFromFetchAPI) {
-            statuses[450] = 'Error form data';
-            this.throw('Ошибки в данных формы', 450);
-          } else {
-            // JS off by client or JS errors (maybe old browser).
+          if (formsHandlers[formName].manualResponse) {
             thisMiddlProps.componentProps.serverErrors = formErrors;
+            // Call registered Form handler
+            yield formsHandlers[formName].handler.call(this, thisMiddlProps);
+            needRenderPage = false;
+          } else {
+            // FetchAPI request. Return HTTP code 450
+            if (requestFromFetchAPI) {
+              statuses[450] = 'Error form data';
+              this.throw('Ошибки в данных формы', 450);
+            } else {
+              // JS off by client or JS errors (maybe old browser).
+              thisMiddlProps.componentProps.serverErrors = formErrors;
+            }
           }
         } else {
           // Call registered Form handler
-          yield formsHandlers[formName].call(this, thisMiddlProps);
+          yield formsHandlers[formName].handler.call(this, thisMiddlProps);
           needRenderPage = false;
         }
         break;

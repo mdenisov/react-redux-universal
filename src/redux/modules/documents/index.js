@@ -1,17 +1,43 @@
-import { init as initDocuments } from './documents';
-import config from '../../../config';
+import { createReducer, mapFromJS } from '../../../helpers/redux';
 
-// Prefetch data
-export const init = params => {
+export const LOAD_DOCUMENTS = 'documents/documents/LOAD_DOCUMENTS';
+export const CLEAN_DOCUMENTS = 'documents/documents/CLEAN_DOCUMENTS';
+
+// Get documents from server
+const getDocuments = ({ apiPath }) => {
   return async (dispatch, getState) => {
-    await dispatch(initDocuments(Object.assign({}, params, { state: getState().documents.documents, services: getState().documents.page.services })));
+    if (!getState().documents.documents.size) {
+      const response = await fetch(`${apiPath}/getDocuments`);
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      const documents = await response.json();
+      dispatch({
+        type: LOAD_DOCUMENTS,
+        documents,
+      });
+    }
   };
 };
 
-const initialState = {
-  services: {
-    getDocuments: `${config.apiPath}/getDocuments`,
-  },
+// Prefetch data
+export const init = (params) => {
+  return async dispatch => {
+    await Promise.all([
+      dispatch(getDocuments(params)),
+    ]);
+  };
 };
 
-export default (state = initialState) => state;
+export const cleanDocuments = () => {
+  return {
+    type: CLEAN_DOCUMENTS,
+  };
+};
+
+const initialState = {};
+
+export default createReducer(initialState, {
+  [LOAD_DOCUMENTS]: (state, action) => mapFromJS(action.documents),
+  [CLEAN_DOCUMENTS]: () => ({}),
+});

@@ -2,12 +2,9 @@ import fs from 'fs';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import serialize from 'serialize-javascript';
-import { RoutingContext } from 'react-router';
+import { RouterContext } from 'react-router';
 import Helmet from 'react-helmet';
 import { Provider } from 'react-redux';
-import createMemoryHistory from 'history/lib/createMemoryHistory';
-import { useBasename } from 'history';
-import useQuerys from 'history/lib/useQueries';
 import config from '../../../config';
 
 const paths = config.get('utils_paths');
@@ -31,7 +28,8 @@ const getTemplate = (() => {
       .replace(
         '<div id="root"></div>', [
           '<div id="root">${content}</div>',
-          '<script>window.__INITIAL_STATE__=${initialState};window.__PROJECT_PATH__=\'${projectPath}\';window.__CURRENT_REDUCERS__=${currentReducers};</script>',
+          '<script>window.__INITIAL_STATE__=${initialState};window.__PROJECT_PATH__=\'${projectPath}\';' +
+          'window.__CURRENT_REDUCERS__=${currentReducers};window.__API_PATH__=\'${apiPath}\';</script>',
         ].join('')
       );
   };
@@ -49,29 +47,41 @@ const renderIntoTemplate = (template, content, instanceStore, title) => {
     .replace('${content}', content)
     .replace('${initialState}', serialize(instanceStore.store.getState()))
     .replace(/\$\{projectPath\}/g, config.get('project_public_path'))
-    .replace('${currentReducers}', serialize(Object.keys(instanceStore.getReducers())));
+    .replace('${currentReducers}', serialize(Object.keys(instanceStore.getReducers())))
+    .replace('${apiPath}', config.get('api_path'));
 };
 
 // Middleware render page
 export default function* ({ instanceStore, renderProps, componentProps }) {
   renderProps.location.basename = config.get('project_public_path');
 
+  const apiPath = `http://${config.get('server_host')}:${config.get('server_port')}${config.get('project_public_path')}${config.get('api_path')}`;
+
   yield fetchComponentData({
+    location: renderProps.location,
     dispatch: instanceStore.store.dispatch,
     components: renderProps.components,
-    params: Object.assign({}, renderProps.params),
-    location: renderProps.location,
+    apiPath,
+    params: {
+      urlParams: renderProps.params,
+      urlQuery: renderProps.location.query,
+    },
   });
 
-  const history = useQuerys(useBasename(createMemoryHistory))({
-    basename: config.get('project_public_path'),
-  });
   const createElement = (Component, props) => {
-    return <Component {...props} {...componentProps}/>;
+    return (
+      <Component
+        {...props}
+        {...componentProps}
+        apiPath={apiPath}
+        instanceStore={instanceStore}
+        projectPath={config.get('project_public_path')}
+      />
+    );
   };
   const node = (
     <Provider store={instanceStore.store}>
-      <RoutingContext {...renderProps} createElement={createElement} history={history}/>
+      <RouterContext {...renderProps} createElement={createElement}/>
     </Provider>
   );
 

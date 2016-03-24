@@ -1,16 +1,17 @@
 import createRoutes from '../routes';
 import { match } from 'react-router';
 
-export configureStore from '../redux/init';
 export { fetchComponentData } from '../helpers/redux';
-if (__DEBUG__) {
-  exports.DevToolsView = require('../components/DevToolsView');
-}
+export configureStore from '../redux/init';
 
 export const route = ({ requestUrl, instanceStore, basename }) => {
   return new Promise((resolve, reject) => {
     const routes = createRoutes(instanceStore);
-    match({ routes, location: requestUrl, basename }, (err, redirectLocation, renderProps) => {
+    let location = requestUrl;
+    if (location.indexOf(basename) === 0) {
+      location = location.substr(basename.length);
+    }
+    match({ routes, location, basename }, (err, redirectLocation, renderProps) => {
       if (err) {
         reject([500], err);
       } else if (redirectLocation) {

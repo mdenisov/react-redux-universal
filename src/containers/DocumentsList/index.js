@@ -1,7 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import * as PageActions from '../../redux/modules/documents/index';
+import * as DocumentsActions from '../../redux/modules/documents/index';
 import styles from './index.css';
 import { Link } from 'react-router';
 
@@ -15,7 +15,7 @@ class DocumentsList extends React.Component {
   };
 
   static fetchData = [
-    PageActions.init,
+    DocumentsActions.init,
   ];
 
   render() {

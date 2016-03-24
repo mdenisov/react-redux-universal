@@ -1,10 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import configureStore from '../redux/init';
-import { useBasename } from 'history';
-import useQuerys from 'history/lib/useQueries';
 import createRoutes from '../routes';
-import { Router, match } from 'react-router';
+import { Router, match, useRouterHistory } from 'react-router';
 import { fetchComponentData, extendLocation, deserializeJavascript } from '../helpers/redux';
 import es6Promise from 'es6-promise';
 import { Provider } from 'react-redux';
@@ -15,26 +13,33 @@ import createHistory from 'history/lib/createBrowserHistory';
 es6Promise.polyfill();
 
 const target = document.getElementById('root');
-const history = useQuerys(useBasename(useScroll(createHistory)))({
+
+// Configure history for react-router
+const history = useRouterHistory(useScroll(createHistory))({
   basename: window.__PROJECT_PATH__,
 });
-const requestUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-let instanceStore = configureStore();
+
+const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
 
 // calling `match` is simply for side effects of
 // loading route/component code for the initial location
-match({ routes: createRoutes(instanceStore), location: requestUrl, basename: window.__PROJECT_PATH__ }, () => {
+let instanceStore = configureStore();
+match({ routes: createRoutes(instanceStore), history }, () => {
   // Recreate store with initial state from server
   instanceStore = configureStore(deserializeJavascript(window.__INITIAL_STATE__), instanceStore.getReducers());
   // Extended object location with redirect methods
   const createElement = (Component, props) => {
     // Asynchronously fetch data
     fetchComponentData({
+      history,
+      location: props.location, // eslint-disable-line react/prop-types
       dispatch: instanceStore.store.dispatch,
       components: [Component],
-      params: Object.assign({}, props.params), // eslint-disable-line react/prop-types
-      location: props.location, // eslint-disable-line react/prop-types
-      history,
+      apiPath,
+      params: {
+        urlParams: props.params, // eslint-disable-line react/prop-types
+        urlQuery: props.location.query, // eslint-disable-line react/prop-types
+      },
     }).catch(err1 => {
       if (!__PROD__) {
         window.console.log(err1);
@@ -42,7 +47,14 @@ match({ routes: createRoutes(instanceStore), location: requestUrl, basename: win
     });
 
     props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
-    return <Component {...props}/>;
+    return (
+      <Component
+        {...props}
+        apiPath={apiPath}
+        instanceStore={instanceStore}
+        projectPath={window.__PROJECT_PATH__}
+      />
+    );
   };
 
   // Create router (map routes)
@@ -52,24 +64,24 @@ match({ routes: createRoutes(instanceStore), location: requestUrl, basename: win
     </Router>
   );
 
-  let node;
-  if (__DEBUG__ && !window.devToolsExtension) {
-    const DevToolsView = require('../components/DevToolsView').default;
-    // Enable Redux dev tools in DEBUG mode
-    node = (
-      <Provider store={instanceStore.store}>
-        <div>
-          {routerInst}
-          <DevToolsView/>
-        </div>
-      </Provider>
-    );
-  } else {
-    node = (
-      <Provider store={instanceStore.store}>
-        {routerInst}
-      </Provider>
-    );
-  }
+  const node = (
+    <Provider store={instanceStore.store}>
+      {routerInst}
+    </Provider>
+  );
+
   ReactDOM.render(node, target);
+
+  if (__DEBUG__ && !window.devToolsExtension) {
+    // Enable Redux dev tools in DEBUG mode
+    const DevToolsView = require('../components/DevToolsView').default;
+    const devNode = (
+      <Provider store={instanceStore.store}>
+        <DevToolsView/>
+      </Provider>
+    );
+    const devTarget = document.createElement('div');
+    target.parentNode.insertBefore(devTarget, target.nextSibling);
+    ReactDOM.render(devNode, devTarget);
+  }
 });

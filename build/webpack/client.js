@@ -99,6 +99,12 @@ const webpackConfig = {
                 }],
               ],
             },
+            production: {
+              plugins: [
+                'transform-react-remove-prop-types',
+                'transform-react-constant-elements',
+              ],
+            },
           },
         },
       },
@@ -166,8 +172,9 @@ if (globals.__PROD__) {
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        'unused': true,
-        'dead_code': true,
+        unused: true,
+        dead_code: true,
+        warnings: false,
       },
     }),
   ];

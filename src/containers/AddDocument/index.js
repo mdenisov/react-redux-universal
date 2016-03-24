@@ -3,7 +3,7 @@ import styles from './index.css';
 import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
-import { cleanDocuments } from '../../redux/modules/documents/documents';
+import { cleanDocuments } from '../../redux/modules/documents';
 import { bindActionCreators } from 'redux';
 import buildSchema from 'redux-form-schema';
 
@@ -32,6 +32,10 @@ class AddDocument extends React.Component {
     submitting: React.PropTypes.bool.isRequired,
     serverErrors: React.PropTypes.object,
     cleanDocuments: React.PropTypes.func,
+  };
+
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -70,7 +74,7 @@ class AddDocument extends React.Component {
         return reject({ _error: 'Внутренняя ошибка сервера' });
       }
       this.props.cleanDocuments();
-      resolve(this.props.history.push('/'));
+      resolve(this.context.router.push('/'));
     });
   };
 

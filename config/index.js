@@ -27,8 +27,18 @@ config.set('dir_dist', 'dist');
 config.set('dir_public', 'public');
 
 config.set('server_host', process.env.NODE_HOST);
+if (config.get('globals').__DEV__ && config.get('server_host') === undefined) {
+  config.set('server_host', process.env.HOSTNAME);
+}
 config.set('server_port', process.env.NODE_PORT);
+if (config.get('globals').__DEV__ && config.get('server_port') === undefined) {
+  config.set('server_port', 4000);
+}
+
 config.set('webpack_host', process.env.NODE_HOST);
+if (config.get('webpack_host') === undefined) {
+  config.set('webpack_host', process.env.HOSTNAME);
+}
 config.set('webpack_port', 3000);
 
 config.set('vendor_dependencies', [

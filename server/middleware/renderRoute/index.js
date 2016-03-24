@@ -18,7 +18,7 @@ export default function* () {
     props = yield route({ requestUrl: this.request.url, instanceStore, basename: config.get('project_public_path') });
 
     // Add handler for AddDocument form
-    forms.addFormHandler('AddDocument', addDocument);
+    forms.addFormHandler(addDocument);
     // Verify and process request with form
     yield forms.processingRequest.call(this, { next: renderRoute, componentProps: {}, instanceStore, renderProps: props });
   } catch (err) {

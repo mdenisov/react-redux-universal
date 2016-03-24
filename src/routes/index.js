@@ -3,10 +3,11 @@ if (typeof require.ensure !== 'function') require.ensure = (d, c) => c(require);
 
 import { IndexRoute, Route } from 'react-router';
 import React from 'react';
+import Core from '../containers/layouts/Core';
 
 export default (instanceStore) => {
   return (
-    <Route path="/">
+    <Route path="/" component={Core}>
       <IndexRoute
         getComponent = {
           (location, callback) => {
