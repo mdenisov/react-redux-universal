@@ -26,8 +26,6 @@ class AddDocument extends React.Component {
   static propTypes = {
     fields: React.PropTypes.object.isRequired,
     handleSubmit: React.PropTypes.func.isRequired,
-    location: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object.isRequired,
     error: React.PropTypes.string,
     submitting: React.PropTypes.bool.isRequired,
     serverErrors: React.PropTypes.object,
@@ -36,6 +34,7 @@ class AddDocument extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.object.isRequired,
+    location: React.PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -79,13 +78,14 @@ class AddDocument extends React.Component {
   };
 
   render() {
-    const { fields: { nameDocument }, handleSubmit, location, submitting, error, serverErrors } = this.props;
+    const { fields: { nameDocument }, handleSubmit, submitting, error, serverErrors } = this.props;
+    const { location } = this.context;
 
     return (
       <div className={styles.w}>
         <Helmet title="Добавление документа"/>
         <div className={styles.logo}/>
-        <form ref="form" className="pure-form pure-form-stacked" method="POST" action={location.pathname} onSubmit={handleSubmit(this.formSubmit)}>
+        <form ref="form" className="pure-form pure-form-stacked" method="POST" action={`${location.basename}${location.pathname}`} onSubmit={handleSubmit(this.formSubmit)}>
           <fieldset>
             <input
               id="nameDocument"

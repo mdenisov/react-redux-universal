@@ -21,7 +21,7 @@ const processingRequest = function* (middlProps) {
   const requestFromFetchAPI = this.request.headers.accept.indexOf('/html') === -1 ? true : false;
   const { next, renderProps } = middlProps;
   const thisMiddlProps = middlProps;
-  thisMiddlProps.componentProps = {};
+  thisMiddlProps.componentProps = middlProps.componentProps;
   let needRenderPage = true;
   // if contentType === application/x-www-form-urlencoded
   if (this.request.headers['content-type'] && this.request.headers['content-type'].indexOf('application/x-www-form-urlencoded') !== -1) {

@@ -47,12 +47,12 @@ match({ routes: createRoutes(instanceStore), history }, () => {
     });
 
     props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
+    props.location.basename = props.location.basename || ''; // eslint-disable-line react/prop-types
     return (
       <Component
         {...props}
         apiPath={apiPath}
         instanceStore={instanceStore}
-        projectPath={window.__PROJECT_PATH__}
       />
     );
   };
