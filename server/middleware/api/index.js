@@ -8,7 +8,7 @@ const router = createRouter();
 // ------------------------------------
 
 // Get documents from JSON file
-router.get(`${config.get('project_public_path')}/api/getDocuments`, function* () {
+router.get(`${config.get('project_public_path')}/api/getDocuments`, function* getDocuments() {
   const documentsJSON = yield httpGetPromise({
     src: 'http://tomcat-bystrobank.rhcloud.com/jparestresource/web/documents',
   });

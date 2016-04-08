@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import configureStore from '../redux/init';
 import createRoutes from '../routes';
 import { Router, match, useRouterHistory } from 'react-router';
-import { fetchComponentData, extendLocation, deserializeJavascript } from '../helpers/redux';
+import { fetchComponentData, deserializeJavascript } from '../helpers/redux';
+import { extendLocation } from '../helpers/location';
 import es6Promise from 'es6-promise';
 import { Provider } from 'react-redux';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
@@ -12,27 +13,34 @@ import createHistory from 'history/lib/createBrowserHistory';
 // Global Promises polyfill for whatwg-fetch
 es6Promise.polyfill();
 
+const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
+const projectPath = window.__PROJECT_PATH__;
+const initialState = window.__INITIAL_STATE__;
 const target = document.getElementById('root');
 
 // Configure history for react-router
 const history = useRouterHistory(useScroll(createHistory))({
-  basename: window.__PROJECT_PATH__,
+  basename: projectPath,
 });
-
-const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
 
 // calling `match` is simply for side effects of
 // loading route/component code for the initial location
 let instanceStore = configureStore();
-match({ routes: createRoutes(instanceStore), history }, () => {
+const createRoutesParams = {
+  instanceStore,
+};
+
+match({ routes: createRoutes(createRoutesParams), history }, () => {
   // Recreate store with initial state from server
-  instanceStore = configureStore(deserializeJavascript(window.__INITIAL_STATE__), instanceStore.getReducers());
+  instanceStore = configureStore(deserializeJavascript(initialState), instanceStore.getReducers());
+  createRoutesParams.instanceStore = instanceStore;
   // Extended object location with redirect methods
   const createElement = (Component, props) => {
     // Asynchronously fetch data
     fetchComponentData({
       history,
       location: props.location, // eslint-disable-line react/prop-types
+      basename: projectPath,
       dispatch: instanceStore.store.dispatch,
       components: [Component],
       apiPath,
@@ -52,6 +60,7 @@ match({ routes: createRoutes(instanceStore), history }, () => {
       <Component
         {...props}
         apiPath={apiPath}
+        projectPath={projectPath}
         instanceStore={instanceStore}
       />
     );
@@ -60,7 +69,7 @@ match({ routes: createRoutes(instanceStore), history }, () => {
   // Create router (map routes)
   const routerInst = (
     <Router history={history} createElement={createElement}>
-      {createRoutes(instanceStore)}
+      {createRoutes(createRoutesParams)}
     </Router>
   );
 

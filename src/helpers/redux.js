@@ -1,5 +1,6 @@
-import qs from 'qs';
 import { combineReducers } from 'redux';
+import { createRouter } from './router';
+import { extendLocation } from './location';
 
 export const createReducer = (initialState, reducerMap) => {
   if (typeof reducerMap !== 'object' || reducerMap === null) {
@@ -16,80 +17,15 @@ export const createReducer = (initialState, reducerMap) => {
   };
 };
 
-const stringifyQuery = (query) => {
-  return qs.stringify(query, { arrayFormat: 'repeat' }).replace(/%20/g, '+');
-};
-const parsePath = path => {
-  if (typeof path === 'object') {
-    let queryString = '';
-    if (path.query) {
-      queryString = stringifyQuery(path.query);
-    }
-    if (queryString === '') {
-      return path.pathname;
-    }
-    return `${path.pathname}${path.pathname.indexOf('?') !== -1 ? '&' : '?'}${queryString}`;
+export const fetchComponentData = ({ history, location, basename, dispatch, components, apiPath, params }) => {
+  let router;
+  if (history && basename !== undefined) {
+    router = createRouter(history, basename);
   }
-  return path;
-};
-
-/**
- * Добавляет методы assign, reload и replace в переданный объект location
- * (на сервере методы возвращают Promise.reject с первым параметром - 302 и вторым параметром - новым URL;
- * на клиенте вызывают родные методы из объекта window.location)
- * Методы assign и replace принимают как строку в качестве параметра, так и объект с сигнатурой:
- * {path: <новый путь>, query: <объект параметров, преобразующийся в param1=valu1&param2=value2...}
- * @param  {Object} location объект
- * @return {Object} location расширенный объект location
- */
-export const extendLocation = (() => {
-  return (location) => {
-    const newLocation = Object.assign({}, location);
-    if (typeof window !== 'undefined') {
-      newLocation.assign = path => {
-        window.location.assign(parsePath(path));
-      };
-      newLocation.reload = forceGet => {
-        window.location.reload(forceGet);
-      };
-      newLocation.replace = path => {
-        window.location.replace(parsePath(path));
-      };
-    } else {
-      newLocation.assign = path => {
-        return Promise.reject([302, parsePath(path)]);
-      };
-      newLocation.reload = () => {
-        return Promise.reject([302, `${location.pathname}${location.search}${location.hash}`]);
-      };
-      newLocation.replace = path => {
-        return Promise.reject([302, parsePath(path)]);
-      };
-    }
-    return newLocation;
-  };
-})();
-
-const createRouter = history => {
-  return {
-    push: path => {
-      if (typeof window !== 'undefined') {
-        history.push(path);
-      }
-      return Promise.reject([302, parsePath(path)]);
-    },
-    replace: path => {
-      if (typeof window !== 'undefined') {
-        history.replace(path);
-      }
-      return Promise.reject([302, parsePath(path)]);
-    },
-  };
-};
-
-export const fetchComponentData = ({ history, location, dispatch, components, apiPath, params }) => {
-  const router = createRouter({ history });
-  const newLocation = extendLocation(location);
+  let newLocation;
+  if (location) {
+    newLocation = extendLocation(location);
+  }
   const fetchData = components.reduce((prev, current) => {
     if (current) {
       return (current.WrappedComponent && Array.isArray(current.WrappedComponent.fetchData) ? current.WrappedComponent.fetchData : (current.fetchData || []))
@@ -198,6 +134,17 @@ export const createStore = (createStoreWithMiddleware) => {
       }
     };
 
+    // Delete reducer from store
+    const unRegisterReducer = reducerName => {
+      if (typeof reducerName !== 'string') {
+        throw new Error(`The reducerName should be string`);
+      }
+      delete reducers[reducerName];
+      if (store) {
+        store.replaceReducer(combineReducers(reducers));
+      }
+    };
+
     if (typeof _reducer === 'object' && _reducer !== null && Object.keys(_reducer).length) {
       registerReducer(_reducer);
       store = createStoreWithMiddleware(combineReducers(reducers), initialState);
@@ -209,6 +156,7 @@ export const createStore = (createStoreWithMiddleware) => {
       registerReducer,
       store,
       getReducers: () => reducers,
+      unRegisterReducer,
     };
   };
 };

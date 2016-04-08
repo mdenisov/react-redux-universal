@@ -1,25 +1,31 @@
 import createRoutes from '../routes';
 import { match } from 'react-router';
+import { HttpError } from '../helpers/customErrors';
 
 export { fetchComponentData } from '../helpers/redux';
+export { extendLocation } from '../helpers/location';
 export configureStore from '../redux/init';
+export * from '../helpers/customErrors.js';
 
-export const route = ({ requestUrl, instanceStore, basename }) => {
+export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) => {
   return new Promise((resolve, reject) => {
-    const routes = createRoutes(instanceStore);
+    const routes = createRoutes(createRoutesParams);
     let location = requestUrl;
     if (location.indexOf(basename) === 0) {
       location = location.substr(basename.length);
     }
+    if (!location.length) {
+      location = '/';
+    }
     match({ routes, location, basename }, (err, redirectLocation, renderProps) => {
       if (err) {
-        reject([500], err);
+        reject(err);
       } else if (redirectLocation) {
-        reject([302, `${redirectLocation.pathname}${redirectLocation.search}${redirectLocation.hash}`]);
+        throw new HttpError(302, `${basename}${redirectLocation.pathname}${redirectLocation.search}${redirectLocation.hash}`);
       } else if (renderProps) {
         resolve(renderProps);
       } else {
-        reject([404]);
+        throw new HttpError(404);
       }
     });
   });

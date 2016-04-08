@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import config from '../../../config';
 
 const paths = config.get('utils_paths');
-const { fetchComponentData } = require(paths.dist('server'));
+const { fetchComponentData, extendLocation } = require(paths.dist('server'));
 const globals = config.get('globals');
 
 // ------------------------------------
@@ -29,7 +29,7 @@ const getTemplate = (() => {
         '<div id="root"></div>', [
           '<div id="root">${content}</div>',
           '<script>window.__INITIAL_STATE__=${initialState};window.__PROJECT_PATH__=\'${projectPath}\';' +
-          'window.__CURRENT_REDUCERS__=${currentReducers};window.__API_PATH__=\'${apiPath}\';</script>',
+          'window.__API_PATH__=\'${apiPath}\';</script>',
         ].join('')
       );
   };
@@ -41,20 +41,18 @@ const getTemplate = (() => {
 })();
 
 // TODO: should probably use a tagged template
-const renderIntoTemplate = (template, content, instanceStore, title) => {
+const renderIntoTemplate = ({ template, content, instanceStore, title }) => {
   return template
     .replace('${title}', title.toString())
     .replace('${content}', content)
     .replace('${initialState}', serialize(instanceStore.store.getState()))
     .replace(/\$\{projectPath\}/g, config.get('project_public_path'))
-    .replace('${currentReducers}', serialize(Object.keys(instanceStore.getReducers())))
     .replace('${apiPath}', config.get('api_path'));
 };
 
 // Middleware render page
-export default function* ({ instanceStore, renderProps, componentProps }) {
-  renderProps.location.basename = config.get('project_public_path');
-
+export default function* ({ instanceStore, renderProps, componentProps, basename }) {
+  renderProps.location.basename = basename;
   const apiPath = `http://${config.get('server_host')}:${config.get('server_port')}${config.get('project_public_path')}${config.get('api_path')}`;
 
   yield fetchComponentData({
@@ -69,12 +67,14 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
   });
 
   const createElement = (Component, props) => {
+    props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
     return (
       <Component
         {...props}
         {...componentProps}
         apiPath={apiPath}
         instanceStore={instanceStore}
+        projectPath={config.get('project_public_path')}
       />
     );
   };
@@ -86,5 +86,10 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
 
   const markup = ReactDOM.renderToString(node);
   const head = Helmet.rewind();
-  this.body = renderIntoTemplate(getTemplate(), markup, instanceStore, head.title);
+  this.body = renderIntoTemplate({
+    template: getTemplate(),
+    content: markup,
+    instanceStore,
+    title: head.title,
+  });
 }
