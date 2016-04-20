@@ -18,10 +18,7 @@ export const createReducer = (initialState, reducerMap) => {
 };
 
 export const fetchComponentData = ({ history, location, basename, dispatch, components, apiPath, params }) => {
-  let router;
-  if (history && basename !== undefined) {
-    router = createRouter(history, basename);
-  }
+  const router = createRouter(history, basename);
   let newLocation;
   if (location) {
     newLocation = extendLocation(location);
@@ -41,6 +38,13 @@ export const fetchComponentData = ({ history, location, basename, dispatch, comp
   return Promise.all(promises);
 };
 
+export function createSerializedMap(map) {
+  map.toJSON = () => {
+    return { '@__Map': Map.toJSON(map) };
+  };
+  return map;
+}
+
 export function deserializeJavascript(source) {
   if (typeof source !== 'object' || source === null) {
     return source;
@@ -49,7 +53,7 @@ export function deserializeJavascript(source) {
   let result;
   if (!Array.isArray(source)) {
     if (source['@__Map'] !== undefined) {
-      result = new Map();
+      result = createSerializedMap(new Map());
       source['@__Map'].forEach(value => {
         if (typeof value[1] === 'object' && value[1] !== null) {
           result.set(value[0], deserializeJavascript(value[1]));
@@ -83,10 +87,7 @@ export function deserializeJavascript(source) {
 }
 
 export function mapFromJS(source) {
-  const result = new Map();
-  result.toJSON = () => {
-    return { '@__Map': Map.toJSON(result) };
-  };
+  const result = createSerializedMap(new Map());
   if (Array.isArray(source)) {
     source.forEach((value, index) => {
       if (Array.isArray(value) && value.length === 2) {
