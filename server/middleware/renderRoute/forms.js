@@ -1,4 +1,4 @@
-import statuses from 'koa/node_modules/statuses';
+import statuses from 'statuses';
 
 const formsHandlers = {};
 const addFormHandler = (arg) => {

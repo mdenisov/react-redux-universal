@@ -27,7 +27,7 @@ const webpackConfig = {
     })),
     new webpack.ProvidePlugin({
       fetch: 'node-fetch',
-      regeneratorRuntime: 'imports?regeneratorRuntime=>undefined!regenerator/runtime',
+      regeneratorRuntime: 'imports?regeneratorRuntime=>undefined!regenerator-runtime/runtime',
     }),
   ],
   resolve: {

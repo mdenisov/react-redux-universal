@@ -5,13 +5,9 @@ import createRoutes from '../routes';
 import { Router, match, useRouterHistory } from 'react-router';
 import { fetchComponentData, deserializeJavascript } from '../helpers/redux';
 import { extendLocation } from '../helpers/location';
-import es6Promise from 'es6-promise';
 import { Provider } from 'react-redux';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
 import createHistory from 'history/lib/createBrowserHistory';
-
-// Global Promises polyfill for whatwg-fetch
-es6Promise.polyfill();
 
 const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
 const projectPath = window.__PROJECT_PATH__;

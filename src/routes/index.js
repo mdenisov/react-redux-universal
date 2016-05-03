@@ -1,22 +1,21 @@
-// polyfill webpack require.ensure
-if (typeof require.ensure !== 'function') require.ensure = (d, c) => c(require);
-
 import { IndexRoute, Route } from 'react-router';
 import React from 'react';
 import createRootComponent from '../helpers/createRootComponent';
+import routerTransition from '../redux/modules/router/transition';
 
 export default ({ instanceStore }) => {
   const Root = createRootComponent();
+  instanceStore.registerReducer({ routerTransition });
   return (
     <Route path="/" component={Root}>
       <IndexRoute
         getComponent = {
           (location, callback) => {
             require.ensure([], (require) => {
-              instanceStore.registerReducer({ 'documents': require(`../redux/modules/documents/reducer`).default });
+              instanceStore.registerReducer({ documents: require(`../redux/modules/documents/reducer`).default });
               if (__HMR__ && module.hot) {// Hot reloading reducer
                 module.hot.accept(`../redux/modules/documents/reducer`, () => {
-                  instanceStore.registerReducer({ 'documents': require(`../redux/modules/documents/reducer`).default });
+                  instanceStore.registerReducer({ documents: require(`../redux/modules/documents/reducer`).default });
                 });
               }
 
@@ -30,7 +29,7 @@ export default ({ instanceStore }) => {
         getComponent = {
           (location, callback) => {
             require.ensure([], (require) => {
-              instanceStore.registerReducer({ 'form': require(`redux-form`).reducer });
+              instanceStore.registerReducer({ form: require(`redux-form`).reducer });
               callback(null, require('../containers/AddDocument').default);
             });
           }

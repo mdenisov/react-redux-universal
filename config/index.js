@@ -42,8 +42,7 @@ if (config.get('webpack_host') === undefined) {
 config.set('webpack_port', 3000);
 
 config.set('vendor_dependencies', [
-  'classnames',
-  'es6-promise',
+  'classnames',  
   'history',
   'whatwg-fetch',
   'react',
