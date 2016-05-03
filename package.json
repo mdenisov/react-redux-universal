@@ -14,7 +14,7 @@
     "_start:dev-server": "node bin/webpack-dev-server",
     "lint": "eslint src/**/*.js src/*.js server/*.js server/**/*.js config/*.js config/**/*.js build/*.js build/**/*.js",
     "dev": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client && npm run _compile:server && concurrent --kill-others \"npm run _compile:client:watch\" \"npm run _compile:server:watch\" \"npm run _start:server\"",
-    "watch": "export NODE_HOST=efrem DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr && npm run _compile:server -- --hmr && concurrent --kill-others \"npm run _compile:server:watch -- --hmr\" \"npm run _start:dev-server -- --hmr\" \"npm run _start:server -- --hmr\"",
+    "watch": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr && npm run _compile:server -- --hmr && concurrent --kill-others \"npm run _compile:server:watch -- --hmr\" \"npm run _start:dev-server -- --hmr\" \"npm run _start:server -- --hmr\"",
     "watch:logger": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr --no_debug --redux_logger && npm run _compile:server -- --hmr --no_debug --redux_logger && concurrent --kill-others \"npm run _compile:server:watch -- --hmr --no_debug --redux_logger\" \"npm run _start:dev-server -- --hmr --no_debug --redux_logger\" \"npm run _start:server -- --hmr --no_debug --redux_logger\"",
     "start": "npm run watch"
   },

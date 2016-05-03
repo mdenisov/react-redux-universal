@@ -21,13 +21,6 @@ class RouterTransition extends React.Component {
     transitionActions: PropTypes.object.isRequired,
   };
 
-  constructor() {
-    super();
-    this.state = {
-      startTimeout: null,
-    };
-  }
-
   start = () => {
     this.startTimeout = setTimeout(() => {
       this.props.transitionActions.start();
