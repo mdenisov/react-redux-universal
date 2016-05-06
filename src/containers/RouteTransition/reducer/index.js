@@ -28,7 +28,7 @@ export const end = (stepDuration = 400) => {
   };
 };
 
-export const start = ({ initialProgress = 15, valueIncreaseProgress = 3, stepDuration = 400, startDelay = 1000 } = {}) => {
+export const start = ({ initialProgress = 15, valueIncreaseProgress = 3, stepDuration = 400 } = {}) => {
   if (isNaN(Number(initialProgress))) throw new Error('Initial progress should be number');
   if (isNaN(Number(stepDuration))) throw new Error('Step Duration progress should be number');
 
@@ -49,7 +49,7 @@ export const start = ({ initialProgress = 15, valueIncreaseProgress = 3, stepDur
         setTimeout(increaseProgress, stepDuration);
       }
     };
-    setTimeout(increaseProgress, startDelay + stepDuration);
+    setTimeout(increaseProgress, stepDuration);
   };
 };
 

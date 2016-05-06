@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react';
 import { VelocityComponent } from 'velocity-react';
 import { connect } from 'react-redux';
-import * as TransitionActions from '../redux/modules/router/transition';
+import * as TransitionActions from './reducer';
 import { bindActionCreators } from 'redux';
+import styles from './index.css';
 
 const mapStateToProps = state => ({
   routerTransition: state.routerTransition,
@@ -38,7 +39,7 @@ class RouterTransition extends React.Component {
       <VelocityComponent animation={{ opacity: start ? 1 : 0 }} duration={400}>
         <div>
           <VelocityComponent animation={{ width: `${progress}%` }} duration={400}>
-            <div style={{ position: 'fixed', left: '0', top: '0', height: '2px', backgroundColor: '#77b6ff', boxShadow: '0 0 10px rgba(119,182,255,0.7)' }}/>
+            <div className={styles.line}/>
           </VelocityComponent>
         </div>
       </VelocityComponent>

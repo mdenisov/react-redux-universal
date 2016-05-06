@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { extendRouter } from '../helpers/router';
-import RouterTransition from '../components/RouterTransition';
+import RouteTransition from '../containers/RouteTransition';
 import { withRouter } from 'react-router';
 
 export default ({
@@ -41,14 +41,14 @@ export default ({
       const { router } = this.props;
       router.listenBefore(newLocation => {
         if (this.getCurrentLocation() !== `${newLocation.pathname}${newLocation.search}`) {
-          this.refs.routerTransition.getWrappedInstance().start();
+          this.routeTransition.getWrappedInstance().start();
         }
       });
     }
 
     componentWillReceiveProps(props) {
       if (props.children !== this.props.children) {
-        this.refs.routerTransition.getWrappedInstance().end();
+        this.routeTransition.getWrappedInstance().end();
       }
     }
 
@@ -59,7 +59,7 @@ export default ({
     render() {
       return (
         <div>
-          <RouterTransition ref="routerTransition"/>
+          <RouteTransition ref={ref => this.routeTransition = ref}/>
           {this.props.children}
         </div>
       );

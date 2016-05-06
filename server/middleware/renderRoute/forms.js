@@ -18,7 +18,8 @@ const addFormHandler = (arg) => {
 };
 
 const processingRequest = function* processingRequest(middlProps) {
-  const requestFromFetchAPI = this.request.headers.accept.indexOf('text/html') === -1 ? true : false;
+  const requestFromFetchAPI = !this.request.headers.accept ||
+    this.request.headers.accept.indexOf('text/html') === -1 ? true : false;
   const { next, renderProps } = middlProps;
   const thisMiddlProps = middlProps;
   thisMiddlProps.componentProps = middlProps.componentProps;

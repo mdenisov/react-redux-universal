@@ -1,7 +1,7 @@
 import { IndexRoute, Route } from 'react-router';
 import React from 'react';
 import createRootComponent from '../helpers/createRootComponent';
-import routerTransition from '../redux/modules/router/transition';
+import routerTransition from '../containers/RouteTransition/reducer';
 
 export default ({ instanceStore }) => {
   const Root = createRootComponent();
