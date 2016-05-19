@@ -13,6 +13,7 @@ const { matchRoutes, configureStore, HttpError } = require(paths.dist('server'))
 export default function* () {
   const instanceStore = configureStore();
   const basename = config.get('project_public_path');
+  const apiPath = `${config.get('project_public_path')}${config.get('api_path')}`;
   let props;
   try {
     // Get route props
@@ -21,6 +22,8 @@ export default function* () {
       basename,
       createRoutesParams: {
         instanceStore,
+        apiPath,
+        projectPath: basename,
       },
     });
 

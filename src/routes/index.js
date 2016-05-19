@@ -1,10 +1,22 @@
 import { IndexRoute, Route } from 'react-router';
-import React from 'react';
+import React, { PropTypes } from 'react';
 import createRootComponent from '../helpers/createRootComponent';
 import routerTransition from '../containers/RouteTransition/reducer';
 
-export default ({ instanceStore }) => {
-  const Root = createRootComponent();
+export default (params) => {
+  const { instanceStore } = params;
+  const Root = createRootComponent({
+    childContextTypes: {
+      apiPath: PropTypes.string.isRequired,
+      instanceStore: PropTypes.object.isRequired,
+      projectPath: PropTypes.string.isRequired,
+    },
+    childContext: {
+      apiPath: params.apiPath,
+      instanceStore: params.instanceStore,
+      projectPath: params.projectPath,
+    },
+  });
   instanceStore.registerReducer({ routerTransition });
   return (
     <Route path="/" component={Root}>

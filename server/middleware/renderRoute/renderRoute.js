@@ -72,9 +72,6 @@ export default function* ({ instanceStore, renderProps, componentProps, basename
       <Component
         {...props}
         {...componentProps}
-        apiPath={apiPath}
-        instanceStore={instanceStore}
-        projectPath={config.get('project_public_path')}
       />
     );
   };

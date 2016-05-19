@@ -25,7 +25,7 @@ class RouterTransition extends React.Component {
   start = () => {
     this.startTimeout = setTimeout(() => {
       this.props.transitionActions.start();
-    }, 1000);
+    }, 100);
   };
 
   end = () => {

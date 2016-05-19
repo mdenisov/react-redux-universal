@@ -28,7 +28,7 @@ config.set('dir_public', 'public');
 
 config.set('server_host', process.env.NODE_HOST);
 if (config.get('globals').__DEV__ && config.get('server_host') === undefined) {
-  if (process.env.HOSTNAME !== undefined) {    
+  if (process.env.HOSTNAME !== undefined) {
     config.set('server_host', process.env.HOSTNAME);
   } else {
     config.set('server_host', 'localhost');
@@ -43,7 +43,7 @@ config.set('webpack_host', config.get('server_host'));
 config.set('webpack_port', 3000);
 
 config.set('vendor_dependencies', [
-  'classnames',  
+  'classnames',
   'history',
   'whatwg-fetch',
   'react',

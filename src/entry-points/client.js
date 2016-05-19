@@ -9,6 +9,11 @@ import { Provider } from 'react-redux';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
 import createHistory from 'history/lib/createBrowserHistory';
 
+// check unnecessary re-renders
+if (__DEV__) {
+  require('why-did-you-update').default(React, { exclude: /^(Root|withRouter|Connect|RouterTransition|AddDocument|ReduxForm)/ });
+}
+
 const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
 const projectPath = window.__PROJECT_PATH__;
 const initialState = window.__INITIAL_STATE__;
@@ -24,6 +29,8 @@ const history = useRouterHistory(useScroll(createHistory))({
 let instanceStore = configureStore();
 const createRoutesParams = {
   instanceStore,
+  apiPath,
+  projectPath,
 };
 
 match({ routes: createRoutes(createRoutesParams), history }, () => {
@@ -55,9 +62,6 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
     return (
       <Component
         {...props}
-        apiPath={apiPath}
-        projectPath={projectPath}
-        instanceStore={instanceStore}
       />
     );
   };

@@ -40,7 +40,11 @@ export const fetchComponentData = ({ history, location, basename, dispatch, comp
 
 export function createSerializedMap(map) {
   map.toJSON = () => {
-    return { '@__Map': Map.toJSON(map) };
+    const result = [];
+    map.forEach((value, key) => {
+      result.push([key, value]);
+    });
+    return { '@__Map': result };
   };
   return map;
 }
