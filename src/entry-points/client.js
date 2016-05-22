@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom';
 import configureStore from '../redux/init';
 import createRoutes from '../routes';
 import { Router, match, useRouterHistory } from 'react-router';
-import { fetchComponentData, deserializeJavascript } from '../helpers/redux';
-import { extendLocation } from '../helpers/location';
+import { deserializeJavascript } from '../helpers/redux';
 import { Provider } from 'react-redux';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
 import createHistory from 'history/lib/createBrowserHistory';
@@ -30,6 +29,7 @@ let instanceStore = configureStore();
 const createRoutesParams = {
   instanceStore,
   apiPath,
+  fullApiPath: apiPath,
   projectPath,
 };
 
@@ -37,38 +37,10 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
   // Recreate store with initial state from server
   instanceStore = configureStore(deserializeJavascript(initialState), instanceStore.getReducers());
   createRoutesParams.instanceStore = instanceStore;
-  // Extended object location with redirect methods
-  const createElement = (Component, props) => {
-    // Asynchronously fetch data
-    fetchComponentData({
-      history,
-      location: props.location, // eslint-disable-line react/prop-types
-      basename: projectPath,
-      dispatch: instanceStore.store.dispatch,
-      components: [Component],
-      apiPath,
-      params: {
-        urlParams: props.params, // eslint-disable-line react/prop-types
-        urlQuery: props.location.query, // eslint-disable-line react/prop-types
-      },
-    }).catch(err1 => {
-      if (!__PROD__) {
-        window.console.log(err1);
-      }
-    });
-
-    props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
-    props.location.basename = props.location.basename || ''; // eslint-disable-line react/prop-types
-    return (
-      <Component
-        {...props}
-      />
-    );
-  };
 
   // Create router (map routes)
   const routerInst = (
-    <Router history={history} createElement={createElement}>
+    <Router history={history}>
       {createRoutes(createRoutesParams)}
     </Router>
   );

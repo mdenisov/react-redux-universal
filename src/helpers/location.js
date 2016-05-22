@@ -11,8 +11,11 @@ import { createPath } from './pathUtils';
  * @return {Object} location расширенный объект location
  */
 export const extendLocation = (() => {
-  return location => {
+  return (location, params) => {
     const newLocation = Object.assign({}, location);
+    newLocation.basename = newLocation.basename || '';
+    newLocation.params = params;
+
     if (typeof window !== 'undefined') {
       newLocation.assign = path => {
         window.location.assign(createPath(path));
@@ -34,6 +37,7 @@ export const extendLocation = (() => {
         throw new HttpError(302, createPath(path));
       };
     }
+
     return newLocation;
   };
 })();

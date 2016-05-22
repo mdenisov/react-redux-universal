@@ -54,6 +54,7 @@ config.set('vendor_dependencies', [
   'react-addons-shallow-compare',
   'redux',
   'redux-thunk',
+  'redux-saga',
   'babel-polyfill',
   'scroll-behavior',
   'qs',

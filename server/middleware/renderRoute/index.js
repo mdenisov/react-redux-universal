@@ -14,6 +14,7 @@ export default function* () {
   const instanceStore = configureStore();
   const basename = config.get('project_public_path');
   const apiPath = `${config.get('project_public_path')}${config.get('api_path')}`;
+  const fullApiPath = `http://${config.get('server_host')}:${config.get('server_port')}${apiPath}`;
   let props;
   try {
     // Get route props
@@ -24,6 +25,7 @@ export default function* () {
         instanceStore,
         apiPath,
         projectPath: basename,
+        fullApiPath,
       },
     });
 

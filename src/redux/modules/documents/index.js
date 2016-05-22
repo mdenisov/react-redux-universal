@@ -1,33 +1,10 @@
 import { createReducer, mapFromJS } from '../../../helpers/redux';
 
 export const LOAD_DOCUMENTS = 'documents/documents/LOAD_DOCUMENTS';
+export const START_LOAD_DOCUMENTS = 'documents/documents/START_LOAD_DOCUMENTS';
+export const ERROR_LOAD_DOCUMENTS = 'documents/documents/ERROR_LOAD_DOCUMENTS';
+export const FINISH_LOAD_DOCUMENTS = 'documents/documents/FINISH_LOAD_DOCUMENTS';
 export const CLEAN_DOCUMENTS = 'documents/documents/CLEAN_DOCUMENTS';
-
-// Get documents from server
-const getDocuments = ({ apiPath }) => {
-  return async (dispatch, getState) => {
-    if (!getState().documents.documents.size) {
-      const response = await fetch(`${apiPath}/getDocuments`);
-      if (response.status !== 200) {
-        throw new Error(response.statusText);
-      }
-      const documents = await response.json();
-      dispatch({
-        type: LOAD_DOCUMENTS,
-        documents,
-      });
-    }
-  };
-};
-
-// Prefetch data
-export const init = (params) => {
-  return async dispatch => {
-    await Promise.all([
-      dispatch(getDocuments(params)),
-    ]);
-  };
-};
 
 export const cleanDocuments = () => {
   return {
@@ -35,9 +12,42 @@ export const cleanDocuments = () => {
   };
 };
 
-const initialState = {};
+export const loadDocuments = params => {
+  return Object.assign({
+    type: LOAD_DOCUMENTS,
+  }, params);
+};
+
+export const startLoadDocuments = () => {
+  return {
+    type: START_LOAD_DOCUMENTS,
+  };
+};
+
+export const errorLoadDocuments = () => {
+  return {
+    type: ERROR_LOAD_DOCUMENTS,
+  };
+};
+
+export const finishLoadDocuments = documents => {
+  return {
+    type: FINISH_LOAD_DOCUMENTS,
+    documents,
+  };
+};
+
+const initialState = {
+  loading: false,
+  error: false,
+  value: null,
+};
+
+const update = (state, mutations) => Object.assign({}, state, mutations);
 
 export default createReducer(initialState, {
-  [LOAD_DOCUMENTS]: (state, action) => mapFromJS(action.documents),
+  [START_LOAD_DOCUMENTS]: state => update(state, { loading: true, error: false, documents: null }),
+  [FINISH_LOAD_DOCUMENTS]: (state, action) => update(state, { loading: false, value: mapFromJS(action.documents) }),
+  [ERROR_LOAD_DOCUMENTS]: state => update(state, { loading: false, error: true }),
   [CLEAN_DOCUMENTS]: () => ({}),
 });

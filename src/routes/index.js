@@ -8,10 +8,12 @@ export default (params) => {
   const Root = createRootComponent({
     childContextTypes: {
       apiPath: PropTypes.string.isRequired,
+      fullApiPath: PropTypes.string.isRequired,
       instanceStore: PropTypes.object.isRequired,
       projectPath: PropTypes.string.isRequired,
     },
     childContext: {
+      fullApiPath: params.fullApiPath,
       apiPath: params.apiPath,
       instanceStore: params.instanceStore,
       projectPath: params.projectPath,

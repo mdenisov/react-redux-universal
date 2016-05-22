@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import config from '../../../config';
 
 const paths = config.get('utils_paths');
-const { fetchComponentData, extendLocation } = require(paths.dist('server'));
+const { extendLocation } = require(paths.dist('server'));
 const globals = config.get('globals');
 
 // ------------------------------------
@@ -53,18 +53,6 @@ const renderIntoTemplate = ({ template, content, instanceStore, title }) => {
 // Middleware render page
 export default function* ({ instanceStore, renderProps, componentProps, basename }) {
   renderProps.location.basename = basename;
-  const apiPath = `http://${config.get('server_host')}:${config.get('server_port')}${config.get('project_public_path')}${config.get('api_path')}`;
-
-  yield fetchComponentData({
-    location: renderProps.location,
-    dispatch: instanceStore.store.dispatch,
-    components: renderProps.components,
-    apiPath,
-    params: {
-      urlParams: renderProps.params,
-      urlQuery: renderProps.location.query,
-    },
-  });
 
   const createElement = (Component, props) => {
     props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
@@ -81,7 +69,26 @@ export default function* ({ instanceStore, renderProps, componentProps, basename
     </Provider>
   );
 
-  const markup = ReactDOM.renderToString(node);
+  // First rendering for starting sagas of fetch data
+  let markup = ReactDOM.renderToString(node);
+
+  // If launched sagas
+  if (instanceStore.launchedSagas.length) {
+    // Stop launched sagas
+    instanceStore.stopSagas();
+
+    // Wait termination all launched sagas
+    yield Promise.all(instanceStore.launchedSagas.map(task => {
+      if (!task.error() || task.isRunning()) {
+        return task.done;
+      }
+    }));
+
+    // Rerender markup already with fetched data
+    markup = ReactDOM.renderToString(node);
+  }
+
+  // console.log(instanceStore.launchedSagas);
   const head = Helmet.rewind();
   this.body = renderIntoTemplate({
     template: getTemplate(),

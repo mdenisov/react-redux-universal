@@ -1,6 +1,4 @@
 import { combineReducers } from 'redux';
-import { createRouter } from './router';
-import { extendLocation } from './location';
 
 export const createReducer = (initialState, reducerMap) => {
   if (typeof reducerMap !== 'object' || reducerMap === null) {
@@ -15,27 +13,6 @@ export const createReducer = (initialState, reducerMap) => {
 
     return reducer ? reducer(state, action) : state;
   };
-};
-
-export const fetchComponentData = ({ history, location, basename, dispatch, components, apiPath, params }) => {
-  const router = createRouter(history, basename);
-  let newLocation;
-  if (location) {
-    newLocation = extendLocation(location);
-  }
-  const fetchData = components.reduce((prev, current) => {
-    if (current) {
-      return (current.WrappedComponent && Array.isArray(current.WrappedComponent.fetchData) ? current.WrappedComponent.fetchData : (current.fetchData || []))
-        .concat(prev);
-    }
-    return prev;
-  }, []);
-
-  const promises = fetchData.map(need => {
-    return dispatch(need(Object.assign({}, params, { router, location: newLocation, apiPath })));
-  });
-
-  return Promise.all(promises);
 };
 
 export function createSerializedMap(map) {
@@ -120,7 +97,14 @@ export function mapFromJS(source) {
   return result;
 }
 
-export const createStore = (createStoreWithMiddleware) => {
+export const createStore = (createStoreWithMiddleware, enhancer) => {
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.');
+    }
+    return enhancer(createStore(createStoreWithMiddleware));
+  }
+
   return (initialState, _reducer) => {
     let reducers = {};
     let store;

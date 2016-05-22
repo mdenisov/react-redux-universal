@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { extendRouter } from '../helpers/router';
+import { extendLocation } from '../helpers/location';
 import RouteTransition from '../containers/RouteTransition';
 import { withRouter } from 'react-router';
 
@@ -12,6 +13,7 @@ export default ({
       children: PropTypes.element.isRequired,
       location: PropTypes.object.isRequired,
       router: PropTypes.object.isRequired,
+      params: PropTypes.object,
     };
 
     static childContextTypes = Object.assign({
@@ -20,7 +22,7 @@ export default ({
     }, childContextTypes);
 
     getChildContext = () => (Object.assign({
-      location: this.props.location,
+      location: extendLocation(this.props.location, this.props.params),
       router: extendRouter(this.props.router, this.props.location.basename),
     }, childContext));
 
