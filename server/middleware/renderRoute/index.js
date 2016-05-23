@@ -32,7 +32,7 @@ export default function* () {
     // Add handler for AddDocument form
     forms.addFormHandler(addDocument);
     // Verify and process request with form
-    yield forms.processingRequest.call(this, { next: renderRoute, componentProps: {}, basename, instanceStore, renderProps: props });
+    yield forms.processingRequest.call(this, { next: renderRoute, componentProps: {}, instanceStore, renderProps: props });
   } catch (err) {
     if (err instanceof HttpError || err.name === 'HttpError') {
       switch (parseInt(err.statusCode, 10)) {

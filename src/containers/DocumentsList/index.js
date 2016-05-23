@@ -35,10 +35,7 @@ class DocumentsList extends React.Component {
     // Run our sagas
     instanceStore.runSaga(rootSaga);
 
-    // Start load documents on saga
-    if (!this.props.documents.value && !this.props.documents.error) {
-      this.props.loadDocuments({ apiPath: this.context.fullApiPath });
-    }
+    this.props.loadDocuments({ apiPath: this.context.fullApiPath });
   }
 
   shouldComponentUpdate(nextProps, nextState) {

@@ -46,8 +46,8 @@ const initialState = {
 const update = (state, mutations) => Object.assign({}, state, mutations);
 
 export default createReducer(initialState, {
-  [START_LOAD_DOCUMENTS]: state => update(state, { loading: true, error: false, documents: null }),
+  [START_LOAD_DOCUMENTS]: state => update(state, { loading: true, error: false, value: null }),
   [FINISH_LOAD_DOCUMENTS]: (state, action) => update(state, { loading: false, value: mapFromJS(action.documents) }),
   [ERROR_LOAD_DOCUMENTS]: state => update(state, { loading: false, error: true }),
-  [CLEAN_DOCUMENTS]: () => ({}),
+  [CLEAN_DOCUMENTS]: state => update(state, initialState),
 });

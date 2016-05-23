@@ -13,7 +13,7 @@ export default ({
       children: PropTypes.element.isRequired,
       location: PropTypes.object.isRequired,
       router: PropTypes.object.isRequired,
-      params: PropTypes.object,
+      params: PropTypes.object.isRequired,
     };
 
     static childContextTypes = Object.assign({

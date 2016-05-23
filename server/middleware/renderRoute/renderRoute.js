@@ -8,7 +8,6 @@ import { Provider } from 'react-redux';
 import config from '../../../config';
 
 const paths = config.get('utils_paths');
-const { extendLocation } = require(paths.dist('server'));
 const globals = config.get('globals');
 
 // ------------------------------------
@@ -51,18 +50,13 @@ const renderIntoTemplate = ({ template, content, instanceStore, title }) => {
 };
 
 // Middleware render page
-export default function* ({ instanceStore, renderProps, componentProps, basename }) {
-  renderProps.location.basename = basename;
-
-  const createElement = (Component, props) => {
-    props.location = extendLocation(props.location); // eslint-disable-line react/prop-types
-    return (
-      <Component
-        {...props}
-        {...componentProps}
-      />
-    );
-  };
+export default function* ({ instanceStore, renderProps, componentProps }) {
+  const createElement = (Component, props) => (
+    <Component
+      {...props}
+      {...componentProps}
+    />
+  );
   const node = (
     <Provider store={instanceStore.store}>
       <RouterContext {...renderProps} createElement={createElement}/>
