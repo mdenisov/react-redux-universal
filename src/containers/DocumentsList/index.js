@@ -3,23 +3,16 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import styles from './index.css';
 import { Link } from 'react-router';
-import rootSaga from '../../redux/modules/documents/sagas';
-import { loadDocuments } from '../../redux/modules/documents';
-import { bindActionCreators } from 'redux';
+import documentsSaga from '../../redux/modules/documents/sagas';
 import shallowCompare from 'react-addons-shallow-compare';
 
 const mapStateToProps = state => ({
   documents: state.documents.documents,
 });
 
-const mapDispatchToProps = dispatch => ({
-  loadDocuments: bindActionCreators(loadDocuments, dispatch),
-});
-
 class DocumentsList extends React.Component {
   static propTypes = {
     documents: PropTypes.object.isRequired,
-    loadDocuments: PropTypes.func.isRequired,
   };
 
   static contextTypes = {
@@ -29,13 +22,12 @@ class DocumentsList extends React.Component {
 
   componentWillMount() {
     const { instanceStore } = this.context;
+    const { documents } = this.props;
 
-    // Stop early running sagas
-    instanceStore.stopSagas();
-    // Run our sagas
-    instanceStore.runSaga(rootSaga);
-
-    this.props.loadDocuments({ apiPath: this.context.fullApiPath });
+    if (!documents.value && !documents.error) {
+      // Run our sagas
+      instanceStore.runSaga('documents/index', documentsSaga, { apiPath: this.context.fullApiPath });
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -80,4 +72,4 @@ class DocumentsList extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DocumentsList);
+export default connect(mapStateToProps)(DocumentsList);

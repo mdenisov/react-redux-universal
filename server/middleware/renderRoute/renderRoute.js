@@ -67,12 +67,14 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
   let markup = ReactDOM.renderToString(node);
 
   // If launched sagas
-  if (instanceStore.launchedSagas.length) {
+  const launchedSagas = instanceStore.getLaunchedSagas();
+  if (Object.keys(launchedSagas).length) {
     // Stop launched sagas
     instanceStore.stopSagas();
 
     // Wait termination all launched sagas
-    yield Promise.all(instanceStore.launchedSagas.map(task => {
+    yield Promise.all(Object.keys(launchedSagas).map(sagaName => {
+      const task = launchedSagas[sagaName];
       if (!task.error() || task.isRunning()) {
         return task.done;
       }

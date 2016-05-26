@@ -1,7 +1,8 @@
 import { compose, createStore, applyMiddleware } from 'redux';
 import { createStore as createStoreHelper } from '../helpers/redux';
-import createSagaMiddleware, { END } from 'redux-saga';
+import createSagaMiddleware from 'redux-saga';
 import reduxThunk from 'redux-thunk';
+import { extendStore as extendStoreForControlToSagas } from '../helpers/sagas';
 
 const middlewares = [reduxThunk];
 if (__CLIENT__ && __REDUX_LOGGER__) {
@@ -31,17 +32,7 @@ export default createStoreHelper(createStoreWithMiddleware(createStore),
   _createStore =>
     (initialState, reducer) => {
       const instanceStore = _createStore(initialState, reducer);
-      if (__SERVER__) {
-        instanceStore.launchedSagas = [];
-        instanceStore.runSaga = (saga, ...args) => {
-          const task = sagaMiddleware.run(saga, ...args);
-          instanceStore.launchedSagas.push(task);
-          return task;
-        };
-      } else {
-        instanceStore.runSaga = sagaMiddleware.run;
-      }
-      instanceStore.stopSagas = () => instanceStore.store.dispatch(END);
+      extendStoreForControlToSagas(instanceStore, sagaMiddleware);
       return instanceStore;
     }
 );

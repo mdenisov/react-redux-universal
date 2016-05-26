@@ -1,6 +1,5 @@
 import { createReducer, mapFromJS } from '../../../helpers/redux';
 
-export const LOAD_DOCUMENTS = 'documents/documents/LOAD_DOCUMENTS';
 export const START_LOAD_DOCUMENTS = 'documents/documents/START_LOAD_DOCUMENTS';
 export const ERROR_LOAD_DOCUMENTS = 'documents/documents/ERROR_LOAD_DOCUMENTS';
 export const FINISH_LOAD_DOCUMENTS = 'documents/documents/FINISH_LOAD_DOCUMENTS';
@@ -10,12 +9,6 @@ export const cleanDocuments = () => {
   return {
     type: CLEAN_DOCUMENTS,
   };
-};
-
-export const loadDocuments = params => {
-  return Object.assign({
-    type: LOAD_DOCUMENTS,
-  }, params);
 };
 
 export const startLoadDocuments = () => {
