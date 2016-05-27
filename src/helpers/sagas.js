@@ -1,30 +1,30 @@
 import { END } from 'redux-saga';
 
 export function extendStore(instanceStore, sagaMiddleware) {
-  const regStrSagaName = '([a-zA-Z0-9_]+\/[a-zA-Z0-9_]+)+';
-  const regSagaName = new RegExp(regStrSagaName);
+  const regStrSagaID = '([a-zA-Z0-9_]+\/[a-zA-Z0-9_]+)+';
+  const regSagaID = new RegExp(regStrSagaID);
   const launchedSagas = {};
-  instanceStore.runSaga = (sagaName, saga, ...args) => {
-    if (typeof sagaName !== 'string' || !regSagaName.test(sagaName)) {
-      throw new Error(`sagaName should be string and match with RegExp - /${regStrSagaName}/`);
-    }
+  instanceStore.runSaga = (saga, ...args) => {
     if (typeof saga !== 'function') {
       throw new Error('saga should be function');
     }
+    if (typeof saga.sagaID !== 'string' || !regSagaID.test(saga.sagaID)) {
+      throw new Error(`Property of the saga sagaID should be string and match with RegExp - /${regStrSagaID}/`);
+    }
     // If saga isn't launched or saga is cancelled
-    if (!launchedSagas[sagaName] || (launchedSagas[sagaName] && !launchedSagas[sagaName].isRunning())) {
+    if (!launchedSagas[saga.sagaID] || (launchedSagas[saga.sagaID] && !launchedSagas[saga.sagaID].isRunning())) {
       const task = sagaMiddleware.run(saga, ...args);
-      launchedSagas[sagaName] = task;
+      launchedSagas[saga.sagaID] = task;
       return task;
     }
   };
   instanceStore.stopSagas = () => instanceStore.store.dispatch(END);
-  instanceStore.stopSagaByName = sagaName => {
-    if (typeof sagaName !== 'string' || !regSagaName.test(sagaName)) {
-      throw new Error(`sagaName should be string and match with RegExp - /${regStrSagaName}/`);
+  instanceStore.stopSagaByName = sagaID => {
+    if (typeof sagaID !== 'string' || !regSagaID.test(sagaID)) {
+      throw new Error(`sagaID should be string and match with RegExp - /${regStrSagaID}/`);
     }
-    if (launchedSagas[sagaName]) {
-      launchedSagas[sagaName].cancel();
+    if (launchedSagas[sagaID]) {
+      launchedSagas[sagaID].cancel();
     }
   };
   instanceStore.getLaunchedSagas = () => Object.assign({}, launchedSagas);

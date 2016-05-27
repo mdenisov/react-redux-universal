@@ -12,3 +12,4 @@ export default function* getDocuments({ apiPath }) {
   const result = yield response.json();
   yield put(finishLoadDocuments(result));
 }
+getDocuments.sagaID = 'documents/index';

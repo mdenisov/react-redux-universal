@@ -26,7 +26,7 @@ class DocumentsList extends React.Component {
 
     if (!documents.value && !documents.error) {
       // Run our sagas
-      instanceStore.runSaga('documents/index', documentsSaga, { apiPath: this.context.fullApiPath });
+      instanceStore.runSaga(documentsSaga, { apiPath: this.context.fullApiPath });
     }
   }
 
