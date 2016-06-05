@@ -53,7 +53,7 @@ const webpackConfig = {
         include: paths.project(config.get('dir_src')),
         loader: 'babel',
         query: {
-          cacheDirectory: globals.__PROD__ ? true : false,
+          cacheDirectory: globals.__PROD__,
           presets: ['es2015'],
           plugins: [
             'syntax-async-functions',
@@ -63,6 +63,7 @@ const webpackConfig = {
             'transform-export-extensions',
             'transform-react-jsx',
             'transform-regenerator',
+            'transform-object-rest-spread',
           ],
           env: {
             production: {
@@ -76,7 +77,9 @@ const webpackConfig = {
       },
       {
         test: /\.css$/,
-        loader: `classes!css?modules&localIdentName=${globals.__PROD__ ? '[hash:base64]' : '[name]---[local]---[hash:base64:5]'}`,
+        loader: `classes!css?modules&localIdentName=${globals.__PROD__ ?
+          '[hash:base64]' :
+          '[name]---[local]---[hash:base64:5]'}`,
       },
       {
         test: /\.(png|jpg|gif|svg|ttf|eot|woff|woff2)$/,

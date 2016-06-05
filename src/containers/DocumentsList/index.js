@@ -4,47 +4,30 @@ import { connect } from 'react-redux';
 import styles from './index.css';
 import { Link } from 'react-router';
 import documentsSaga from '../../redux/modules/documents/sagas';
-import shallowCompare from 'react-addons-shallow-compare';
-
-const mapStateToProps = state => ({
-  documents: state.documents.documents,
-});
+import * as fromDocuments from '../../redux/modules/documents/reducer';
 
 class DocumentsList extends React.Component {
-  static propTypes = {
-    documents: PropTypes.object.isRequired,
-  };
-
-  static contextTypes = {
-    instanceStore: PropTypes.object.isRequired,
-    fullApiPath: PropTypes.string.isRequired,
-  };
-
   componentWillMount() {
     const { instanceStore } = this.context;
-    const { documents } = this.props;
+    const { documents, error } = this.props;
 
-    if (!documents.value && !documents.error) {
+    if (!documents && !error) {
       // Run our sagas
       instanceStore.runSaga(documentsSaga, { apiPath: this.context.fullApiPath });
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
-  }
-
   render() {
-    const { documents } = this.props;
+    const { documents, isLoading, error } = this.props;
 
     return (
       <div className={styles.w}>
         <Helmet title="Документы" />
-        <div className={styles.logo}/>
+        <div className={styles.logo} />
         <Link to="addDocument">Добавить документ</Link>
-        { documents.loading && <p>Загружаю...</p> }
-        { documents.error && <p>Внутренняя ошибка приложения</p> }
-        { documents.value &&
+        {isLoading && <p>Загружаю...</p>}
+        {error && <p>Внутренняя ошибка приложения</p>}
+        {documents &&
           <table className="pure-table">
             <caption className={styles.caption}>Документы</caption>
             <thead>
@@ -54,16 +37,17 @@ class DocumentsList extends React.Component {
               </tr>
             </thead>
             <tbody>
-              {[...documents.value].map(document => {
-                return (
-                  <tr key={document[0]}>
-                    <td>{document[1].get('docDate').split('-').reverse().join('.')}</td>
-                    <td>
-                      <Link to="documentInfo">{document[1].get('displayName')}</Link>
-                    </td>
-                  </tr>
-                );
-              })}
+              {[...documents].map(document => (
+                <tr key={document[0]}>
+                  <td>
+                    {document[1].get('docDate').split('-').reverse().
+                    join('.')}
+                  </td>
+                  <td>
+                    <Link to="documentInfo">{document[1].get('displayName')}</Link>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         }
@@ -72,4 +56,19 @@ class DocumentsList extends React.Component {
   }
 }
 
-export default connect(mapStateToProps)(DocumentsList);
+DocumentsList.propTypes = {
+  documents: PropTypes.object,
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+};
+
+DocumentsList.contextTypes = {
+  instanceStore: PropTypes.object.isRequired,
+  fullApiPath: PropTypes.string.isRequired,
+};
+
+export default connect((state) => ({
+  documents: fromDocuments.getDocuments(state),
+  isLoading: fromDocuments.isLoading(state),
+  error: fromDocuments.getError(state),
+}))(DocumentsList);

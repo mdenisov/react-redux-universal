@@ -5,42 +5,46 @@ export const ERROR_LOAD_DOCUMENTS = 'documents/documents/ERROR_LOAD_DOCUMENTS';
 export const FINISH_LOAD_DOCUMENTS = 'documents/documents/FINISH_LOAD_DOCUMENTS';
 export const CLEAN_DOCUMENTS = 'documents/documents/CLEAN_DOCUMENTS';
 
-export const cleanDocuments = () => {
-  return {
-    type: CLEAN_DOCUMENTS,
-  };
-};
+export const cleanDocuments = () => ({
+  type: CLEAN_DOCUMENTS,
+});
 
-export const startLoadDocuments = () => {
-  return {
-    type: START_LOAD_DOCUMENTS,
-  };
-};
+export const startLoadDocuments = () => ({
+  type: START_LOAD_DOCUMENTS,
+});
 
-export const errorLoadDocuments = () => {
-  return {
-    type: ERROR_LOAD_DOCUMENTS,
-  };
-};
+export const errorLoadDocuments = (error) => ({
+  type: ERROR_LOAD_DOCUMENTS,
+  error,
+});
 
-export const finishLoadDocuments = documents => {
-  return {
-    type: FINISH_LOAD_DOCUMENTS,
-    documents,
-  };
-};
+export const finishLoadDocuments = (documents) => ({
+  type: FINISH_LOAD_DOCUMENTS,
+  documents,
+});
+
+export const getDocuments = (state) =>
+  state.value;
+
+export const getError = (state) =>
+  state.error;
+
+export const isLoading = (state) =>
+  state.loading;
 
 const initialState = {
   loading: false,
-  error: false,
+  error: null,
   value: null,
 };
 
-const update = (state, mutations) => Object.assign({}, state, mutations);
-
 export default createReducer(initialState, {
-  [START_LOAD_DOCUMENTS]: state => update(state, { loading: true, error: false, value: null }),
-  [FINISH_LOAD_DOCUMENTS]: (state, action) => update(state, { loading: false, value: mapFromJS(action.documents) }),
-  [ERROR_LOAD_DOCUMENTS]: state => update(state, { loading: false, error: true }),
-  [CLEAN_DOCUMENTS]: state => update(state, initialState),
+  [START_LOAD_DOCUMENTS]: (state) =>
+    ({ ...state, loading: true, error: null, value: null }),
+  [FINISH_LOAD_DOCUMENTS]: (state, action) =>
+    ({ ...state, loading: false, value: mapFromJS(action.documents) }),
+  [ERROR_LOAD_DOCUMENTS]: (state, action) =>
+    ({ ...state, loading: false, error: action.error }),
+  [CLEAN_DOCUMENTS]: (state) =>
+    ({ ...state, ...initialState }),
 });

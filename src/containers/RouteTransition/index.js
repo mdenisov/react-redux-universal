@@ -14,24 +14,24 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class RouterTransition extends React.Component {
-  static propTypes = {
-    routerTransition: PropTypes.shape({
-      progress: PropTypes.number.isRequired,
-      start: PropTypes.bool.isRequired,
-    }).isRequired,
-    transitionActions: PropTypes.object.isRequired,
-  };
+  constructor(props) {
+    super(props);
+    props.bindApi({
+      start: this.start.bind(this),
+      end: this.end.bind(this),
+    });
+  }
 
-  start = () => {
+  start() {
     this.startTimeout = setTimeout(() => {
       this.props.transitionActions.start();
     }, 100);
-  };
+  }
 
-  end = () => {
+  end() {
     clearTimeout(this.startTimeout);
     this.props.transitionActions.end();
-  };
+  }
 
   render() {
     const { start, progress } = this.props.routerTransition;
@@ -39,7 +39,7 @@ class RouterTransition extends React.Component {
       <VelocityComponent animation={{ opacity: start ? 1 : 0 }} duration={400}>
         <div>
           <VelocityComponent animation={{ width: `${progress}%` }} duration={400}>
-            <div className={styles.line}/>
+            <div className={styles.line} />
           </VelocityComponent>
         </div>
       </VelocityComponent>
@@ -47,4 +47,13 @@ class RouterTransition extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(RouterTransition);
+RouterTransition.propTypes = {
+  routerTransition: PropTypes.shape({
+    progress: PropTypes.number.isRequired,
+    start: PropTypes.bool.isRequired,
+  }).isRequired,
+  transitionActions: PropTypes.object.isRequired,
+  bindApi: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RouterTransition);

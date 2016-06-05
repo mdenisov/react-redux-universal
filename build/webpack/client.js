@@ -8,8 +8,10 @@ const paths = config.get('utils_paths');
 const globals = config.get('globals');
 
 const addHash = (template, hash) => {
-  return globals.__PROD__ ?
-      template.replace(/\.[^.]+$/, `.[${hash}]$&`) : `${template}?hash=[${hash}]`;
+  if (globals.__PROD__) {
+    template.replace(/\.[^.]+$/, `.[${hash}]$&`);
+  }
+  return `${template}?hash=[${hash}]`;
 };
 
 const webpackConfig = {
@@ -24,14 +26,17 @@ const webpackConfig = {
   },
   output: {
     path: `${paths.public('client')}`,
-    publicPath: globals.__HMR__ ? config.get('webpack_public_path') : `${config.get('project_public_path')}/public/client/`,
+    publicPath:
+      globals.__HMR__ ?
+      config.get('webpack_public_path') :
+      `${config.get('project_public_path')}/public/client/`,
     filename: addHash('[name].js', globals.__PROD__ ? 'chunkhash' : 'hash'),
     chunkFilename: addHash('[id].js', 'chunkhash'),
   },
   plugins: [
     new webpack.DefinePlugin(Object.assign(globals, {
       'process.env': {
-        'NODE_ENV': JSON.stringify(config.get('env')),
+        NODE_ENV: JSON.stringify(config.get('env')),
       },
       __CLIENT__: true,
       __SERVER__: false,
@@ -42,7 +47,10 @@ const webpackConfig = {
       hash: true,
       minify: globals.__PROD__ ? { collapseWhitespace: true } : false,
     }),
-    new ExtractTextPlugin(addHash('[name].css', 'contenthash'), { allChunks: true, disable: globals.__HMR__ }),
+    new ExtractTextPlugin(
+      addHash('[name].css', 'contenthash'),
+      { allChunks: true, disable: globals.__HMR__ }
+    ),
     new webpack.ProvidePlugin({
       fetch: 'exports?window.fetch!whatwg-fetch',
     }),
@@ -64,7 +72,7 @@ const webpackConfig = {
         include: paths.project(config.get('dir_src')),
         loader: 'babel',
         query: {
-          cacheDirectory: globals.__PROD__ ? true : false,
+          cacheDirectory: globals.__PROD__,
           presets: ['es2015'],
           plugins: [
             'syntax-async-functions',
@@ -74,6 +82,7 @@ const webpackConfig = {
             'transform-export-extensions',
             'transform-react-jsx',
             'transform-regenerator',
+            'transform-object-rest-spread',
           ],
           env: {
             development: {
@@ -85,13 +94,14 @@ const webpackConfig = {
                 'transform-export-extensions',
                 'transform-react-jsx',
                 'transform-regenerator',
+                'transform-object-rest-spread',
                 // must be an array with options object as second item
                 ['react-transform', {
                   // must be an array of objects
-                  'transforms': [{
+                  transforms: [{
                     // you can have many transforms, not just one
-                    'transform': 'react-transform-catch-errors',
-                    'imports': ['react', 'redbox-react'],
+                    transform: 'react-transform-catch-errors',
+                    imports: ['react', 'redbox-react'],
                   }],
                   // by default we only look for `React.createClass` (and ES6 classes)
                   // but you can tell the plugin to look for different component factories:
@@ -112,7 +122,9 @@ const webpackConfig = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract(
             'style',
-            `css?modules&importLoaders=1&localIdentName=${globals.__PROD__ ? '[hash:base64]' : '[name]---[local]---[hash:base64:5]'}!postcss`),
+            `css?modules&importLoaders=1&localIdentName=${globals.__PROD__ ?
+              '[hash:base64]' :
+              '[name]---[local]---[hash:base64:5]'}!postcss`),
       },
       {
         test: /\.(png|jpg|gif|svg|ttf|eot|woff|woff2)$/,
@@ -136,7 +148,7 @@ const webpackConfig = {
 if (globals.__HMR__) {
   webpackConfig.entry.app.push(
     `webpack-dev-server/client?${config.get('webpack_public_path')}`,
-    `webpack/hot/only-dev-server`
+    'webpack/hot/only-dev-server'
   );
 
   webpackConfig.plugins.push(
@@ -149,10 +161,10 @@ if (globals.__HMR__) {
         if (Array.isArray(plugin) && plugin[0] === 'react-transform') {
           loader.query.env.development.plugins[index][1].transforms.push({
             // can be an NPM module name or a local path
-            'transform': 'react-transform-hmr',
+            transform: 'react-transform-hmr',
             // see transform docs for "imports" and "locals" dependencies
-            'imports': ['react'],
-            'locals': ['module'],
+            imports: ['react'],
+            locals: ['module'],
           });
         }
       });

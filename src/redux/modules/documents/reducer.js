@@ -1,6 +1,14 @@
-import { combineReducers } from 'redux';
-import documents from './index';
+import documents, * as fromDocuments from './index';
 
-export default combineReducers({
+export default {
   documents,
-});
+};
+
+export const getDocuments = (state) =>
+  fromDocuments.getDocuments(state.documents);
+
+export const getError = (state) =>
+  fromDocuments.getError(state.documents);
+
+export const isLoading = (state) =>
+  fromDocuments.isLoading(state.documents);

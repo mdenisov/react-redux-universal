@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import configureStore from '../redux/init';
@@ -10,7 +11,10 @@ import createHistory from 'history/lib/createBrowserHistory';
 
 // check unnecessary re-renders
 if (__DEV__) {
-  require('why-did-you-update').default(React, { exclude: /^(Root|withRouter|Connect|RouterTransition|AddDocument|ReduxForm)/ });
+  require('why-did-you-update').default(
+    React,
+    { exclude: /^(Root|withRouter|Connect|RouterTransition|AddDocument|ReduxForm)/ }
+  );
 }
 
 const apiPath = `${window.__PROJECT_PATH__}${window.__API_PATH__}`;
@@ -58,7 +62,7 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
     const DevToolsView = require('../components/DevToolsView').default;
     const devNode = (
       <Provider store={instanceStore.store}>
-        <DevToolsView/>
+        <DevToolsView />
       </Provider>
     );
     const devTarget = document.createElement('div');

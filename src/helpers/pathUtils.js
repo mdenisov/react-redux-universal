@@ -1,8 +1,7 @@
 import qs from 'qs';
 
-const stringifyQuery = query => {
-  return qs.stringify(query, { arrayFormat: 'brackets' }).replace(/%20/g, '+');
-};
+const stringifyQuery = query =>
+  qs.stringify(query, { arrayFormat: 'brackets' }).replace(/%20/g, '+');
 
 export const createPath = path => {
   if (typeof path === 'object') {
@@ -41,6 +40,8 @@ export const checkRelativePath = path => {
   }
   const match = path.match(/^https?:\/\/[^\/]*/);
   if (match) {
-    throw new Error(`A path must be pathname + search + hash only, not a fully qualified URL like "${path}"`);
+    throw new Error(
+      'A path must be pathname + search + hash only, ' +
+      `not a fully qualified URL like "${path}"`);
   }
 };

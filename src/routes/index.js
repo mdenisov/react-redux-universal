@@ -23,13 +23,15 @@ export default (params) => {
   return (
     <Route path="/" component={Root}>
       <IndexRoute
-        getComponent = {
+        getComponent={
           (location, callback) => {
             require.ensure([], (require) => {
-              instanceStore.registerReducer({ documents: require(`../redux/modules/documents/reducer`).default });
-              if (__HMR__ && module.hot) {// Hot reloading reducer
-                module.hot.accept(`../redux/modules/documents/reducer`, () => {
-                  instanceStore.registerReducer({ documents: require(`../redux/modules/documents/reducer`).default });
+              instanceStore.registerReducer(require('../redux/modules/documents/reducer').default);
+              if (__HMR__ && module.hot) { // Hot reloading reducer
+                module.hot.accept('../redux/modules/documents/reducer', () => {
+                  instanceStore.registerReducer(
+                    require('../redux/modules/documents/reducer').default
+                  );
                 });
               }
 
@@ -40,10 +42,10 @@ export default (params) => {
       />
       <Route
         path="addDocument"
-        getComponent = {
+        getComponent={
           (location, callback) => {
             require.ensure([], (require) => {
-              instanceStore.registerReducer({ form: require(`redux-form`).reducer });
+              instanceStore.registerReducer({ form: require('redux-form').reducer });
               callback(null, require('../containers/AddDocument').default);
             });
           }
@@ -51,7 +53,7 @@ export default (params) => {
       />
       <Route
         path="documentInfo"
-        getComponent = {
+        getComponent={
           (location, callback) => {
             require.ensure([], (require) => {
               callback(null, require('../containers/DocumentInfo').default);

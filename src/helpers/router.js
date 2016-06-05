@@ -1,13 +1,13 @@
+/* eslint-disable no-param-reassign */
 import { HttpError } from './customErrors';
 import { createPath, addBasename, checkRelativePath } from './pathUtils';
 
-const pushReplace = basename => {
-  return path => {
+const pushReplace = basename =>
+  path => {
     checkRelativePath(path);
     const newPath = addBasename(path, basename);
     throw new HttpError(302, createPath(newPath));
   };
-};
 
 export const extendRouter = (router, basename) => {
   if (typeof window === 'undefined') {
@@ -24,6 +24,7 @@ export const createRouter = (history, basename) => {
     throw new HttpError(302, createPath(newPath));
   };
   return {
+    // eslint-disable-next-line
     push: path => {
       if (typeof window !== 'undefined') {
         history.push(path);
@@ -31,6 +32,7 @@ export const createRouter = (history, basename) => {
       }
       serverSide(path);
     },
+    // eslint-disable-next-line
     replace: path => {
       if (typeof window !== 'undefined') {
         history.replace(path);

@@ -14,11 +14,12 @@
     "__CLIENT__" : false,
     "__SERVER__" : false,
     "__REDUX_LOGGER__" : false,
-    "__PROJECT_PATH__" : false,    
+    "__PROJECT_PATH__" : false,
   },
   "rules": {
     "no-script-url" : 0,
-    "no-alert": 0
+    "no-alert": 0,
+    "no-underscore-dangle": 0,
   },
   "plugins": [
     "react", "import"

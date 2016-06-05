@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import http from 'http';
 import url from 'url';
 import { logger, loggerDateTime, loggerWithoutDate } from './logger';
@@ -56,6 +57,7 @@ const httpLog = (() => {
 
         return _maskData;
       }
+      return null;
     };
 
     const keyDescriptions = {
@@ -141,18 +143,30 @@ const httpLog = (() => {
  * @param headers
  * @returns {Promise|function(): Promise}
  */
-export const httpGetPromise = ({ src, accept = 'application/json', headers = {}, recursion, port }) => {
-  return new Promise((resolve, reject) => {
+export const httpGetPromise = ({
+  src,
+  accept = 'application/json',
+  headers = {},
+  recursion,
+  port,
+}) =>
+  new Promise((resolve, reject) => {
     let result = new Buffer('');
     const extHeaders = Object.assign(headers, {
-      'Accept': accept,
+      Accept: accept,
     });
-    const req = http.request(buildHTTPRequest({ src, method: 'GET', headers: extHeaders, port }), res => {
+    const req = http.request(buildHTTPRequest({
+      src,
+      method:
+      'GET',
+      headers: extHeaders,
+      port,
+    }), res => {
       res.on('data', data => {
         result = Buffer.concat([result, data]);
       });
       res.on('end', () => {
-        if (res.statusCode === 202 && res.headers.refresh) {// Async request
+        if (res.statusCode === 202 && res.headers.refresh) { // Async request
           const refreshData = res.headers.refresh.split(';');
           setTimeout(() => {
             httpGetPromise({ src: refreshData[1], recursion: true }).then(() => {
@@ -161,7 +175,7 @@ export const httpGetPromise = ({ src, accept = 'application/json', headers = {},
               httpLog(
                 {
                   requestURL: src,
-                  requestMethod: `GET`,
+                  requestMethod: 'GET',
                   responseHeaders: res.headers,
                   requestHeaders: extHeaders,
                 },
@@ -170,65 +184,68 @@ export const httpGetPromise = ({ src, accept = 'application/json', headers = {},
               reject(err);
             });
           }, parseInt(refreshData[0], 10) * 1000);
-        } else if (res.statusCode > 300 && res.statusCode < 400 && res.headers.location) { // Detect a redirect
-          const redirectURL = url.parse(res.headers.location);
-          const srcURL = url.parse(src);
-          if (redirectURL.hostname && redirectURL.hostname === srcURL.hostname) {
-            httpGetPromise({ src: res.headers.location, recursion: true }).then(() => {
-              resolve();
-            }).catch((err) => {
-              if (!recursion) {
-                httpLog(
-                  {
-                    requestURL: src,
-                    requestMethod: `GET`,
-                    responseHeaders: res.headers,
-                    requestHeaders: extHeaders,
-                  },
-                  recursion
-                );
-              }
-              reject(err);
-            });
-          } else {
-            httpLog(
-              {
-                requestURL: src,
-                requestMethod: `GET`,
-                statusCode: `${res.statusCode} ${res.statusMessage}`,
-                responseHeaders: res.headers,
-                requestHeaders: extHeaders,
-              },
-              recursion
-            );
-            reject({
-              res,
-              url: src,
-            });
-          }
-        } else { // Otherwise no redirect; capture the response as normal
-          if (res.statusCode !== 200) {
-            if (result) {
-              result = result.toString('utf8');
+        } else {
+          // Detect a redirect
+          if (res.statusCode > 300 && res.statusCode < 400 && res.headers.location) {
+            const redirectURL = url.parse(res.headers.location);
+            const srcURL = url.parse(src);
+            if (redirectURL.hostname && redirectURL.hostname === srcURL.hostname) {
+              httpGetPromise({ src: res.headers.location, recursion: true }).then(() => {
+                resolve();
+              }).catch((err) => {
+                if (!recursion) {
+                  httpLog(
+                    {
+                      requestURL: src,
+                      requestMethod: 'GET',
+                      responseHeaders: res.headers,
+                      requestHeaders: extHeaders,
+                    },
+                    recursion
+                  );
+                }
+                reject(err);
+              });
+            } else {
+              httpLog(
+                {
+                  requestURL: src,
+                  requestMethod: 'GET',
+                  statusCode: `${res.statusCode} ${res.statusMessage}`,
+                  responseHeaders: res.headers,
+                  requestHeaders: extHeaders,
+                },
+                recursion
+              );
+              reject({
+                res,
+                url: src,
+              });
             }
-            httpLog(
-              {
-                requestURL: src,
-                requestMethod: `GET`,
-                statusCode: `${res.statusCode} ${res.statusMessage}`,
-                responseHeaders: res.headers,
-                responseBody: result,
-                requestHeaders: extHeaders,
-              },
-              recursion
-            );
-            reject({
-              res,
-              result,
-              url: src,
-            });
+          } else { // Otherwise no redirect; capture the response as normal
+            if (res.statusCode !== 200) {
+              if (result) {
+                result = result.toString('utf8');
+              }
+              httpLog(
+                {
+                  requestURL: src,
+                  requestMethod: 'GET',
+                  statusCode: `${res.statusCode} ${res.statusMessage}`,
+                  responseHeaders: res.headers,
+                  responseBody: result,
+                  requestHeaders: extHeaders,
+                },
+                recursion
+              );
+              reject({
+                res,
+                result,
+                url: src,
+              });
+            }
+            resolve(result.toString('utf8'));
           }
-          resolve(result.toString('utf8'));
         }
       });
     });
@@ -237,7 +254,7 @@ export const httpGetPromise = ({ src, accept = 'application/json', headers = {},
       httpLog(
         {
           requestURL: src,
-          requestMethod: `GET`,
+          requestMethod: 'GET',
           errorMessage: ex.message,
           requestHeaders: extHeaders,
         },
@@ -246,4 +263,3 @@ export const httpGetPromise = ({ src, accept = 'application/json', headers = {},
       reject(ex);
     });
   });
-};

@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 
 export const createReducer = (initialState, reducerMap) => {
   if (typeof reducerMap !== 'object' || reducerMap === null) {
-    throw new Error(`Reducer map isn't valid`);
+    throw new Error('Reducer map isn\'t valid');
   }
 
   return (state = initialState, action = null) => {
@@ -16,14 +16,15 @@ export const createReducer = (initialState, reducerMap) => {
 };
 
 export function createSerializedMap(map) {
-  map.toJSON = () => {
+  const extMap = map;
+  extMap.toJSON = () => {
     const result = [];
     map.forEach((value, key) => {
       result.push([key, value]);
     });
     return { '@__Map': result };
   };
-  return map;
+  return extMap;
 }
 
 export function deserializeJavascript(source) {
@@ -44,15 +45,13 @@ export function deserializeJavascript(source) {
       });
     } else {
       result = {};
-      for (const key in source) {
-        if (source.hasOwnProperty(key)) {
-          if (typeof source[key] === 'object' && source[key] !== null) {
-            result[key] = deserializeJavascript(source[key]);
-          } else {
-            result[key] = source[key];
-          }
+      Object.keys(source).forEach(key => {
+        if (typeof source[key] === 'object' && source[key] !== null) {
+          result[key] = deserializeJavascript(source[key]);
+        } else {
+          result[key] = source[key];
         }
-      }
+      });
     }
   } else {
     result = [];
@@ -84,15 +83,13 @@ export function mapFromJS(source) {
       }
     });
   } else if (typeof source === 'object' && source !== null) {
-    for (const key in source) {
-      if (source.hasOwnProperty(key)) {
-        if (typeof source[key] === 'object' && source[key] !== null) {
-          result.set(key, mapFromJS(source[key]));
-        } else {
-          result.set(key, source[key]);
-        }
+    Object.keys(source).forEach(key => {
+      if (typeof source[key] === 'object' && source[key] !== null) {
+        result.set(key, mapFromJS(source[key]));
+      } else {
+        result.set(key, source[key]);
       }
-    }
+    });
   }
   return result;
 }
@@ -112,7 +109,7 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
     // Add reducer in store
     const registerReducer = (reducer, replaceReducer = false) => {
       if (reducer === null || typeof reducer !== 'object' || Object.keys(reducer).length === 0) {
-        throw new Error(`The reducer shall be non empty object`);
+        throw new Error('The reducer shall be non empty object');
       }
       if (replaceReducer) {
         reducers = {};
@@ -126,7 +123,7 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
     // Delete reducer from store
     const unRegisterReducer = reducerName => {
       if (typeof reducerName !== 'string') {
-        throw new Error(`The reducerName should be string`);
+        throw new Error('The reducerName should be string');
       }
       delete reducers[reducerName];
       if (store) {

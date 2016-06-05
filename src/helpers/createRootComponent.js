@@ -9,35 +9,30 @@ export default ({
     childContext,
   } = {}) => {
   class Root extends React.Component {
-    static propTypes = {
-      children: PropTypes.element.isRequired,
-      location: PropTypes.object.isRequired,
-      router: PropTypes.object.isRequired,
-      params: PropTypes.object.isRequired,
-    };
+    constructor() {
+      super();
+      this.bindApi = this.bindApi.bind(this);
+    }
 
-    static childContextTypes = Object.assign({
-      location: PropTypes.object.isRequired,
-      router: PropTypes.object.isRequired,
-    }, childContextTypes);
-
-    getChildContext = () => (Object.assign({
-      location: extendLocation(this.props.location, this.props.params),
-      router: extendRouter(this.props.router, this.props.location.basename),
-    }, childContext));
+    getChildContext() {
+      return Object.assign({
+        location: extendLocation(this.props.location, this.props.params),
+        router: extendRouter(this.props.router, this.props.location.basename),
+      }, childContext);
+    }
 
     componentDidMount() {
       const { router } = this.props;
       router.listenBefore(newLocation => {
         if (this.getCurrentLocation() !== `${newLocation.pathname}${newLocation.search}`) {
-          this.routeTransition.getWrappedInstance().start();
+          this.routeTransitionStart();
         }
       });
     }
 
     componentWillReceiveProps(props) {
       if (props.children !== this.props.children) {
-        this.routeTransition.getWrappedInstance().end();
+        this.routeTransitionEnd();
       }
     }
 
@@ -45,14 +40,32 @@ export default ({
       return `${window.location.pathname}${window.location.search}`;
     }
 
+    bindApi({ start, end }) {
+      this.routeTransitionStart = start;
+      this.routeTransitionEnd = end;
+    }
+
     render() {
       return (
         <div>
-          <RouteTransition ref={ref => this.routeTransition = ref}/>
+          <RouteTransition bindApi={this.bindApi} />
           {this.props.children}
         </div>
       );
     }
   }
+
+  Root.propTypes = {
+    children: PropTypes.element.isRequired,
+    location: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
+  };
+
+  Root.childContextTypes = Object.assign({
+    location: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
+  }, childContextTypes);
+
   return withRouter(Root);
 };

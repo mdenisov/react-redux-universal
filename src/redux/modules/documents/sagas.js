@@ -6,7 +6,7 @@ export default function* getDocuments({ apiPath }) {
   yield put(startLoadDocuments());
   const response = yield call(fetch, `${apiPath}/getDocuments`);
   if (response.status !== 200) {
-    yield put(errorLoadDocuments());
+    yield put(errorLoadDocuments(response.statusText));
     return;
   }
   const result = yield response.json();

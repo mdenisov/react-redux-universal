@@ -4,11 +4,11 @@ import { HttpError } from '../helpers/customErrors';
 
 export { fetchComponentData } from '../helpers/redux';
 export { extendLocation } from '../helpers/location';
-export configureStore from '../redux/init';
+export { default as configureStore } from '../redux/init';
 export * from '../helpers/customErrors.js';
 
-export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) => {
-  return new Promise((resolve, reject) => {
+export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) =>
+  new Promise((resolve, reject) => {
     const routes = createRoutes(createRoutesParams);
     let location = requestUrl;
     if (location.indexOf(basename) === 0) {
@@ -21,7 +21,11 @@ export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) => {
       if (err) {
         reject(err);
       } else if (redirectLocation) {
-        throw new HttpError(302, `${basename}${redirectLocation.pathname}${redirectLocation.search}${redirectLocation.hash}`);
+        throw new HttpError(
+          302,
+          `${basename}${redirectLocation.pathname}${redirectLocation.search}` +
+          `${redirectLocation.hash}`
+        );
       } else if (renderProps) {
         resolve(renderProps);
       } else {
@@ -29,4 +33,3 @@ export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) => {
       }
     });
   });
-};

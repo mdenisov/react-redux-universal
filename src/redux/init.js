@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 import { compose, createStore, applyMiddleware } from 'redux';
 import { createStore as createStoreHelper } from '../helpers/redux';
 import createSagaMiddleware from 'redux-saga';

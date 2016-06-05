@@ -12,8 +12,8 @@ const setProgress = (value = 3) => {
   };
 };
 
-export const end = (stepDuration = 400) => {
-  return (dispatch, getState) => {
+export const end = (stepDuration = 400) =>
+  (dispatch, getState) => {
     if (getState().routerTransition.start) {
       dispatch(setProgress(100));
       setTimeout(() => {
@@ -26,9 +26,11 @@ export const end = (stepDuration = 400) => {
       }, stepDuration);
     }
   };
-};
 
-export const start = ({ initialProgress = 15, valueIncreaseProgress = 3, stepDuration = 400 } = {}) => {
+export const start = ({
+  initialProgress = 15,
+  valueIncreaseProgress = 3,
+  stepDuration = 400 } = {}) => {
   if (isNaN(Number(initialProgress))) throw new Error('Initial progress should be number');
   if (isNaN(Number(stepDuration))) throw new Error('Step Duration progress should be number');
 
