@@ -44,6 +44,8 @@ Features
 * [scroll-behavior](https://github.com/rackt/scroll-behavior)
 * [redux-form](https://github.com/erikras/redux-form)
 * [redux-form-schema](https://github.com/Lighthouse-io/redux-form-schema)
+* [redux-immutable-state-invariant](https://github.com/leoasis/redux-immutable-state-invariant)
+* [why-did-you-update](https://github.com/garbles/why-did-you-update)
 
 Getting Started
 ---------------
