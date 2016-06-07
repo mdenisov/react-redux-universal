@@ -18,8 +18,8 @@ const globals = config.get('globals');
 // on generated assets, and we maintain a consistent index.html file between
 // client-side development w/ webpack-dev-server and server rendering.
 const getTemplate = (() => {
-  const renderTemplate = () => {
-    return fs.readFileSync(paths.public(`client/index.html`), 'utf-8')
+  const renderTemplate = () =>
+    fs.readFileSync(paths.public('client/index.html'), 'utf-8')
       .replace(
         '<title>Empty page</title>',
         '${title}'
@@ -27,11 +27,13 @@ const getTemplate = (() => {
       .replace(
         '<div id="root"></div>', [
           '<div id="root">${content}</div>',
-          '<script>window.__INITIAL_STATE__=${initialState};window.__PROJECT_PATH__=\'${projectPath}\';' +
-          'window.__API_PATH__=\'${apiPath}\';</script>',
+          '<script>',
+          'window.__INITIAL_STATE__=${initialState};',
+          'window.__PROJECT_PATH__=\'${projectPath}\';',
+          'window.__API_PATH__=\'${apiPath}\';',
+          '</script>',
         ].join('')
       );
-  };
   if (globals.__PROD__) {
     const renderedTemplate = renderTemplate();
     return () => renderedTemplate;
@@ -40,14 +42,13 @@ const getTemplate = (() => {
 })();
 
 // TODO: should probably use a tagged template
-const renderIntoTemplate = ({ template, content, instanceStore, title }) => {
-  return template
+const renderIntoTemplate = ({ template, content, instanceStore, title }) =>
+  template
     .replace('${title}', title.toString())
     .replace('${content}', content)
     .replace('${initialState}', serialize(instanceStore.store.getState()))
     .replace(/\$\{projectPath\}/g, config.get('project_public_path'))
     .replace('${apiPath}', config.get('api_path'));
-};
 
 // Middleware render page
 export default function* ({ instanceStore, renderProps, componentProps }) {
@@ -59,7 +60,7 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
   );
   const node = (
     <Provider store={instanceStore.store}>
-      <RouterContext {...renderProps} createElement={createElement}/>
+      <RouterContext {...renderProps} createElement={createElement} />
     </Provider>
   );
 
@@ -78,6 +79,7 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
       if (!task.error() || task.isRunning()) {
         return task.done;
       }
+      return Promise.resolve();
     }));
 
     // Rerender markup already with fetched data

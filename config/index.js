@@ -74,6 +74,9 @@ config.set('webpack_public_path',
 // ------------------------------------
 config.set('path_project', path.resolve(__dirname, '../'));
 config.set('project_public_path', process.env.PROJECT_PATH);
+if (config.get('project_public_path').length && config.get('project_public_path')[0] !== '/') {
+  throw new Error('PROJECT_PATH should begin from slash');
+}
 config.set('api_path', '/api');
 
 // ------------------------------------
@@ -107,8 +110,10 @@ config.set('vendor_dependencies', config.get('vendor_dependencies')
     debug(
       `Package "${dep}" was not found as an npm dependency in package.json; ` +
       `it won't be included in the webpack vendor bundle.\n` +
-      `Consider removing it from vendor_dependencies in ~/config/index.js`
+      'Consider removing it from vendor_dependencies in ~/config/index.js'
     );
+
+    return false;
   })
 );
 
