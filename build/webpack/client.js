@@ -9,7 +9,7 @@ const globals = config.get('globals');
 
 const addHash = (template, hash) => {
   if (globals.__PROD__) {
-    template.replace(/\.[^.]+$/, `.[${hash}]$&`);
+    return template.replace(/\.[^.]+$/, `.[${hash}]$&`);
   }
   return `${template}?hash=[${hash}]`;
 };

@@ -21,8 +21,7 @@
   "author": "Aleksandr Efremov <eav@bystrobank.ru>",
   "license": "MIT",
   "engines": {
-    "node": ">4.0.0 <5.0.0",
-    "npm": ">3.0.0"
+    "node": ">4.0.0 <5.0.0"
   },
   "dependencies": {
     "autoprefixer": "^6.3.4",

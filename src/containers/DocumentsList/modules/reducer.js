@@ -1,4 +1,4 @@
-import documents, * as fromDocuments from './index';
+import documents, * as fromDocuments from './documents';
 
 export default {
   documents,

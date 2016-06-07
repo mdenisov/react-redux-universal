@@ -26,11 +26,13 @@ export default (params) => {
         getComponent={
           (location, callback) => {
             require.ensure([], (require) => {
-              instanceStore.registerReducer(require('../redux/modules/documents/reducer').default);
+              instanceStore.registerReducer(
+                require('../containers/DocumentsList/modules/reducer').default
+              );
               if (__HMR__ && module.hot) { // Hot reloading reducer
-                module.hot.accept('../redux/modules/documents/reducer', () => {
+                module.hot.accept('../containers/DocumentsList/modules/reducer', () => {
                   instanceStore.registerReducer(
-                    require('../redux/modules/documents/reducer').default
+                    require('../containers/DocumentsList/modules/reducer').default
                   );
                 });
               }

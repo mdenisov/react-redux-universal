@@ -3,8 +3,8 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import styles from './index.css';
 import { Link } from 'react-router';
-import documentsSaga from '../../redux/modules/documents/sagas';
-import * as fromDocuments from '../../redux/modules/documents/reducer';
+import documentsSaga from './modules/documents/sagas';
+import * as fromDocuments from './modules/reducer';
 
 class DocumentsList extends React.Component {
   componentWillMount() {

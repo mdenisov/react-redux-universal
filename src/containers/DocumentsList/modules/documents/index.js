@@ -1,9 +1,9 @@
-import { createReducer, mapFromJS } from '../../../helpers/redux';
+import { createReducer, mapFromJS } from '../../../../helpers/redux';
 
-export const START_LOAD_DOCUMENTS = 'documents/documents/START_LOAD_DOCUMENTS';
-export const ERROR_LOAD_DOCUMENTS = 'documents/documents/ERROR_LOAD_DOCUMENTS';
-export const FINISH_LOAD_DOCUMENTS = 'documents/documents/FINISH_LOAD_DOCUMENTS';
-export const CLEAN_DOCUMENTS = 'documents/documents/CLEAN_DOCUMENTS';
+export const START_LOAD_DOCUMENTS = 'documentsList/documents/START_LOAD_DOCUMENTS';
+export const ERROR_LOAD_DOCUMENTS = 'documentsList/documents/ERROR_LOAD_DOCUMENTS';
+export const FINISH_LOAD_DOCUMENTS = 'documentsList/documents/FINISH_LOAD_DOCUMENTS';
+export const CLEAN_DOCUMENTS = 'documentsList/documents/CLEAN_DOCUMENTS';
 
 export const cleanDocuments = () => ({
   type: CLEAN_DOCUMENTS,
