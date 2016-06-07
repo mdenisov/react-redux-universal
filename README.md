@@ -13,7 +13,7 @@ Table of Contents
 Requirements
 ------------
 
-Node `^4.2.3`
+Node `^4.0.0`
 
 Features
 --------
