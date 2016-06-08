@@ -84,6 +84,8 @@ export default function* ({ instanceStore, renderProps, componentProps }) {
 
     // Rerender markup already with fetched data
     markup = ReactDOM.renderToString(node);
+    // Stop launched sagas for exclude memory leak
+    instanceStore.stopSagas();
   }
 
   // console.log(instanceStore.launchedSagas);
