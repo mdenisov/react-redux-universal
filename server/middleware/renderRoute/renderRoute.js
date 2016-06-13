@@ -22,15 +22,15 @@ const getTemplate = (() => {
     fs.readFileSync(paths.public('client/index.html'), 'utf-8')
       .replace(
         '<title>Empty page</title>',
-        '${title}'
+        '<?title?>'
       )
       .replace(
         '<div id="root"></div>', [
-          '<div id="root">${content}</div>',
+          '<div id="root"><?content?></div>',
           '<script>',
-          'window.__INITIAL_STATE__=${initialState};',
-          'window.__PROJECT_PATH__=\'${projectPath}\';',
-          'window.__API_PATH__=\'${apiPath}\';',
+          'window.__INITIAL_STATE__=<?initialState?>;',
+          'window.__PROJECT_PATH__=\'<?projectPath?>\';',
+          'window.__API_PATH__=\'<?apiPath?>\';',
           '</script>',
         ].join('')
       );
@@ -44,11 +44,11 @@ const getTemplate = (() => {
 // TODO: should probably use a tagged template
 const renderIntoTemplate = ({ template, content, instanceStore, title }) =>
   template
-    .replace('${title}', title.toString())
-    .replace('${content}', content)
-    .replace('${initialState}', serialize(instanceStore.store.getState()))
-    .replace(/\$\{projectPath\}/g, config.get('project_public_path'))
-    .replace('${apiPath}', config.get('api_path'));
+    .replace('<?title?>', title.toString())
+    .replace('<?content?>', content)
+    .replace('<?initialState?>', serialize(instanceStore.store.getState()))
+    .replace(/<\?projectPath\?>/g, config.get('project_public_path'))
+    .replace('<?apiPath?>', config.get('api_path'));
 
 // Middleware render page
 export default function* ({ instanceStore, renderProps, componentProps }) {

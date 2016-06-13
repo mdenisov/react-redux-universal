@@ -2,7 +2,10 @@ import webpack from 'webpack';
 import config from '../../config';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import autoprefixer from 'autoprefixer';
+import cssnext from 'postcss-cssnext';
+import postcssFocus from 'postcss-focus';
+import postcssReporter from 'postcss-reporter';
+import StyleLintPlugin from 'stylelint-webpack-plugin';
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
@@ -17,7 +20,7 @@ const addHash = (template, hash) => {
 const webpackConfig = {
   name: 'client',
   target: 'web',
-  devtool: globals.__PROD__ ? 'source-map' : 'eval',
+  devtool: globals.__PROD__ ? 'source-map' : 'cheap-module-eval-source-map',
   entry: {
     app: [
       'babel-polyfill',
@@ -53,6 +56,12 @@ const webpackConfig = {
     ),
     new webpack.ProvidePlugin({
       fetch: 'exports?window.fetch!whatwg-fetch',
+    }),
+    new StyleLintPlugin({
+      configFile: '.stylelintrc',
+      context: paths.src(),
+      files: '**/*.css',
+      failOnError: globals.__PROD__,
     }),
   ],
   resolve: {
@@ -132,7 +141,15 @@ const webpackConfig = {
       },
     ],
   },
-  postcss: [autoprefixer({ browsers: ['not ie <= 8'] })],
+  postcss: [
+    postcssFocus(), // Add a :focus to every :hover
+    cssnext({ // Allow future CSS features to be used, also auto-prefixes the CSS...
+      browsers: ['last 2 versions', 'IE >= 9'], // ...based on this browser list
+    }),
+    postcssReporter({ // Posts messages from plugins to the terminal
+      clearMessages: true,
+    }),
+  ],
   eslint: {
     configFile: paths.project('.eslintrc'),
     failOnWarning: globals.__PROD__,
@@ -180,7 +197,7 @@ if (globals.__PROD__) {
       filename: addHash('vendor.js', globals.__PROD__ ? 'chunkhash' : 'hash'),
     }),
     new webpack.NoErrorsPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(true),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {

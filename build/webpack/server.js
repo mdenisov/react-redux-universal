@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import config from '../../config';
 import fs from 'fs';
+import StyleLintPlugin from 'stylelint-webpack-plugin';
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
@@ -28,6 +29,12 @@ const webpackConfig = {
     new webpack.ProvidePlugin({
       fetch: 'node-fetch',
       regeneratorRuntime: 'imports?regeneratorRuntime=>undefined!regenerator-runtime/runtime',
+    }),
+    new StyleLintPlugin({
+      configFile: '.stylelintrc',
+      context: paths.src(),
+      files: '**/*.css',
+      failOnError: globals.__PROD__,
     }),
   ],
   resolve: {
