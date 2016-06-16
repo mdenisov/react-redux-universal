@@ -3,10 +3,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import configureStore from '../redux/init';
 import createRoutes from '../routes';
-import { Router, match, useRouterHistory } from 'react-router';
+import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-router';
+import useScroll from 'react-router-scroll';
 import { deserializeJavascript } from '../helpers/redux';
 import { Provider } from 'react-redux';
-import useScroll from 'scroll-behavior/lib/useStandardScroll';
 import createHistory from 'history/lib/createBrowserHistory';
 
 // check unnecessary re-renders
@@ -23,7 +23,7 @@ const initialState = window.__INITIAL_STATE__;
 const target = document.getElementById('root');
 
 // Configure history for react-router
-const history = useRouterHistory(useScroll(createHistory))({
+const history = useRouterHistory(createHistory)({
   basename: projectPath,
 });
 
@@ -44,7 +44,7 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
 
   // Create router (map routes)
   const routerInst = (
-    <Router history={history}>
+    <Router history={history} render={applyRouterMiddleware(useScroll())}>
       {createRoutes(createRoutesParams)}
     </Router>
   );
