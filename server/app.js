@@ -1,13 +1,12 @@
-import createRoutes from '../routes';
+import createRoutes from '../src/routes';
 import { match } from 'react-router';
-import { HttpError } from '../helpers/customErrors';
+import { HttpError } from '../src/helpers/customErrors';
 
-export { fetchComponentData } from '../helpers/redux';
-export { extendLocation } from '../helpers/location';
-export { default as configureStore } from '../redux/init';
-export * from '../helpers/customErrors.js';
+export { extendLocation } from '../src/helpers/location';
+export { default as configureStore } from '../src/redux/init';
+export * from '../src/helpers/customErrors.js';
 
-export const matchRoutes = ({ requestUrl, createRoutesParams, basename }) =>
+export const matchRoute = ({ requestUrl, createRoutesParams, basename }) =>
   new Promise((resolve, reject) => {
     const routes = createRoutes(createRoutesParams);
     let location = requestUrl;

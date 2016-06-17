@@ -23,6 +23,7 @@ config.set('globals', {
 // User Configuration
 // ------------------------------------
 config.set('dir_src', 'src');
+config.set('dir_server', 'server');
 config.set('dir_dist', 'dist');
 config.set('dir_public', 'public');
 
@@ -56,7 +57,7 @@ config.set('vendor_dependencies', [
   'redux-thunk',
   'redux-saga',
   'babel-polyfill',
-  'scroll-behavior',
+  'react-router-scroll',
   'qs',
   'redux-form',
   'redux-form-schema',
@@ -91,6 +92,7 @@ const paths = (() => {
   return {
     project,
     src: project.bind(null, config.get('dir_src')),
+    server: project.bind(null, config.get('dir_server')),
     dist: project.bind(null, config.get('dir_dist')),
     public: project.bind(null, config.get('dir_public')),
   };

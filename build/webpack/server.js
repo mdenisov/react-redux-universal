@@ -11,7 +11,7 @@ const webpackConfig = {
   target: 'node',
   entry: {
     app: [
-      paths.src('entry-points/server'),
+      paths.server('app'),
     ],
   },
   externals: fs.readdirSync('node_modules').filter(module => module !== '.bin'),
@@ -28,7 +28,6 @@ const webpackConfig = {
     })),
     new webpack.ProvidePlugin({
       fetch: 'node-fetch',
-      regeneratorRuntime: 'imports?regeneratorRuntime=>undefined!regenerator-runtime/runtime',
     }),
     new StyleLintPlugin({
       configFile: '.stylelintrc',
@@ -51,13 +50,19 @@ const webpackConfig = {
       {
         test: /\.js$/,
         loader: 'eslint',
-        include: paths.project(config.get('dir_src')),
+        include: [
+          paths.project(config.get('dir_src')),
+          paths.project(config.get('dir_server')),
+        ],
       },
     ],
     loaders: [
       {
         test: /\.js$/,
-        include: paths.project(config.get('dir_src')),
+        include: [
+          paths.project(config.get('dir_src')),
+          paths.project(config.get('dir_server')),
+        ],
         loader: 'babel',
         query: {
           cacheDirectory: globals.__PROD__,
@@ -71,6 +76,10 @@ const webpackConfig = {
             'transform-react-jsx',
             'transform-regenerator',
             'transform-object-rest-spread',
+            ['transform-runtime', {
+              polyfill: false,
+              regenerator: true,
+            }],
           ],
           env: {
             production: {

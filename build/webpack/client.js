@@ -24,7 +24,7 @@ const webpackConfig = {
   entry: {
     app: [
       'babel-polyfill',
-      paths.src('entry-points/client'),
+      paths.src('index'),
     ],
   },
   output: {

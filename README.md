@@ -100,15 +100,16 @@ The folder structure provided is only meant to serve as a guide, it is by no mea
 |   |   ├── api              # Available to application of API
 |   |   ├── renderRoute      # Routes rendering
 |   |   └── ...              # Other middlewares
+│   ├── app.js               # Server side entry point in application
 │   └── index.js             # Server application entry point
 ├── src                      # Application source code
 │   ├── components           # Common React components
 │   ├── config               # Application configuration settings
 │   ├── containers           # Layouts, routes root smart components with child dumb components, reducers, actions, sagas, styles etc and other HOC with reducers, actions, sagas, styles etc combined on features
-│   ├── entry-points         # Server side and client side entry points in application
 │   ├── helpers              # Helpers of application
 │   ├── redux                # Common reducers
 │   ├── routes               # Application route definitions
+│   ├── index.js             # Client side entry point in application
 │   └── index.html           # HTML template of application
 ├── .babelrc                 # Global babel settings
 ├── .editorconfig            # Editor config

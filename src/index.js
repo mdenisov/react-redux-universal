@@ -1,11 +1,11 @@
 /* eslint-disable global-require */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import configureStore from '../redux/init';
-import createRoutes from '../routes';
+import configureStore from './redux/init';
+import createRoutes from './routes';
 import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-router';
 import useScroll from 'react-router-scroll';
-import { deserializeJavascript } from '../helpers/redux';
+import { deserializeJavascript } from './helpers/redux';
 import { Provider } from 'react-redux';
 import createHistory from 'history/lib/createBrowserHistory';
 
@@ -59,7 +59,7 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
 
   if (__DEBUG__ && !window.devToolsExtension) {
     // Enable Redux dev tools in DEBUG mode
-    const DevToolsView = require('../components/DevToolsView').default;
+    const DevToolsView = require('./components/DevToolsView').default;
     const devNode = (
       <Provider store={instanceStore.store}>
         <DevToolsView />

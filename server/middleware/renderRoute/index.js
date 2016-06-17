@@ -5,7 +5,7 @@ import forms from './forms';
 import addDocument from './formsHandlers/addDocument';
 
 const paths = config.get('utils_paths');
-const { matchRoutes, configureStore, HttpError } = require(paths.dist('server'));
+const { matchRoute, configureStore, HttpError } = require(paths.dist('server'));
 
 // ------------------------------------
 // Rendering Middleware
@@ -18,7 +18,7 @@ export default function* () {
   let props;
   try {
     // Get route props
-    props = yield matchRoutes({
+    props = yield matchRoute({
       requestUrl: this.request.url,
       basename,
       createRoutesParams: {
@@ -32,7 +32,12 @@ export default function* () {
     // Add handler for AddDocument form
     forms.addFormHandler(addDocument);
     // Verify and process request with form
-    yield forms.processingRequest.call(this, { next: renderRoute, componentProps: {}, instanceStore, renderProps: props });
+    yield forms.processingRequest.call(this, {
+      next: renderRoute,
+      componentProps: {},
+      instanceStore,
+      renderProps: props,
+    });
   } catch (err) {
     if (err instanceof HttpError || err.name === 'HttpError') {
       switch (parseInt(err.statusCode, 10)) {
