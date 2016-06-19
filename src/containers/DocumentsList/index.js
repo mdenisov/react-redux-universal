@@ -5,56 +5,41 @@ import styles from './index.css';
 import { Link } from 'react-router';
 import documentsSaga from './modules/documents/sagas';
 import * as fromDocuments from './modules/reducer';
+import { compose, getContext, lifecycle } from 'recompose';
 
-class DocumentsList extends React.Component {
-  componentWillMount() {
-    const { instanceStore } = this.context;
-    const { documents, error } = this.props;
-
-    if (!documents && !error) {
-      // Run our sagas
-      instanceStore.runSaga(documentsSaga, { apiPath: this.context.fullApiPath });
+const DocumentsList = ({ documents, isLoading, error }) => (
+  <div className={styles.w}>
+    <Helmet title="Документы" />
+    <div className={styles.logo} />
+    <Link to="addDocument">Добавить документ</Link>
+    {isLoading && <p>Загружаю...</p>}
+    {error && <p>Внутренняя ошибка приложения</p>}
+    {documents &&
+      <table className="pure-table">
+        <caption className={styles.caption}>Документы</caption>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Наименование</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...documents].map(document => (
+            <tr key={document[0]}>
+              <td>
+                {document[1].get('docDate').split('-').reverse().
+                join('.')}
+              </td>
+              <td>
+                <Link to="documentInfo">{document[1].get('displayName')}</Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     }
-  }
-
-  render() {
-    const { documents, isLoading, error } = this.props;
-
-    return (
-      <div className={styles.w}>
-        <Helmet title="Документы" />
-        <div className={styles.logo} />
-        <Link to="addDocument">Добавить документ</Link>
-        {isLoading && <p>Загружаю...</p>}
-        {error && <p>Внутренняя ошибка приложения</p>}
-        {documents &&
-          <table className="pure-table">
-            <caption className={styles.caption}>Документы</caption>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Наименование</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...documents].map(document => (
-                <tr key={document[0]}>
-                  <td>
-                    {document[1].get('docDate').split('-').reverse().
-                    join('.')}
-                  </td>
-                  <td>
-                    <Link to="documentInfo">{document[1].get('displayName')}</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        }
-      </div>
-    );
-  }
-}
+  </div>
+);
 
 DocumentsList.propTypes = {
   documents: PropTypes.object,
@@ -62,13 +47,24 @@ DocumentsList.propTypes = {
   error: PropTypes.string,
 };
 
-DocumentsList.contextTypes = {
-  instanceStore: PropTypes.object.isRequired,
-  fullApiPath: PropTypes.string.isRequired,
-};
+export default compose(
+  connect((state) => ({
+    documents: fromDocuments.getDocuments(state),
+    isLoading: fromDocuments.isLoading(state),
+    error: fromDocuments.getError(state),
+  })),
+  getContext({
+    instanceStore: PropTypes.object,
+    fullApiPath: PropTypes.string,
+  }),
+  lifecycle({
+    componentWillMount() {
+      const { documents, error, instanceStore, fullApiPath } = this.props;
 
-export default connect((state) => ({
-  documents: fromDocuments.getDocuments(state),
-  isLoading: fromDocuments.isLoading(state),
-  error: fromDocuments.getError(state),
-}))(DocumentsList);
+      if (!documents && !error) {
+        // Run our sagas
+        instanceStore.runSaga(documentsSaga, { apiPath: fullApiPath });
+      }
+    },
+  })
+)(DocumentsList);

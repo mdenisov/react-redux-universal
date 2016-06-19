@@ -6,6 +6,7 @@ import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
 import { cleanDocuments } from '../DocumentsList/modules/documents';
 import buildSchema from 'redux-form-schema';
+import { compose, getContext } from 'recompose';
 
 const schema = {
   nameDocument: {
@@ -46,12 +47,12 @@ class AddDocument extends React.Component {
         reject({ _error: 'Внутренняя ошибка сервера' });
       }
       this.props.cleanDocuments();
-      resolve(this.context.router.push('/'));
+      resolve(this.props.router.push('/'));
     });
 
   render() {
-    const { fields: { nameDocument }, handleSubmit, submitting, error, serverErrors } = this.props;
-    const { location } = this.context;
+    const { fields: { nameDocument }, handleSubmit, submitting,
+      error, serverErrors, location } = this.props;
 
     return (
       <div className={styles.w}>
@@ -107,9 +108,6 @@ AddDocument.propTypes = {
   submitting: React.PropTypes.bool.isRequired,
   serverErrors: React.PropTypes.object,
   cleanDocuments: React.PropTypes.func,
-};
-
-AddDocument.contextTypes = {
   router: React.PropTypes.object.isRequired,
   location: React.PropTypes.object.isRequired,
 };
@@ -124,10 +122,16 @@ AddDocument.formValidate = {
   validate,
 };
 
-export default reduxForm({
-  form: 'AddDocument',
-  fields,
-  validate,
-}, null, {
-  cleanDocuments,
-})(AddDocument);
+export default compose(
+  reduxForm({
+    form: 'AddDocument',
+    fields,
+    validate,
+  }, null, {
+    cleanDocuments,
+  }),
+  getContext({
+    router: React.PropTypes.object,
+    location: React.PropTypes.object,
+  })
+)(AddDocument);

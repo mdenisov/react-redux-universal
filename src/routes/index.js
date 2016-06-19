@@ -1,7 +1,7 @@
 import { IndexRoute, Route } from 'react-router';
 import React, { PropTypes } from 'react';
 import createRootComponent from '../helpers/createRootComponent';
-import routerTransition from '../containers/RouteTransition/reducer';
+import routerTransition from '../components/PageLoadProgressBar/reducer';
 
 export default (params) => {
   const { instanceStore } = params;

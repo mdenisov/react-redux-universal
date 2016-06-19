@@ -13,7 +13,9 @@ import createHistory from 'history/lib/createBrowserHistory';
 if (__DEV__) {
   require('why-did-you-update').default(
     React,
-    { exclude: /^(Root|withRouter|Connect|RouterTransition|AddDocument|ReduxForm)/ }
+    {
+      exclude: new RegExp('^(withRouter|Connect|ReduxForm|withContext|pure|onlyUpdateForKeys)'),
+    }
   );
 }
 

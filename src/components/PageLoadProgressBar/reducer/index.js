@@ -14,7 +14,8 @@ const setProgress = (value = 3) => {
 
 export const end = (stepDuration = 400) =>
   (dispatch, getState) => {
-    if (getState().routerTransition.start) {
+    const { start: flagStart, progress } = getState().routerTransition;
+    if (flagStart && progress > 0 && progress < 100) {
       dispatch(setProgress(100));
       setTimeout(() => {
         dispatch({
