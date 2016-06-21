@@ -14,7 +14,8 @@ if (__DEV__) {
   require('why-did-you-update').default(
     React,
     {
-      exclude: new RegExp('^(withRouter|Connect|ReduxForm|withContext|pure|onlyUpdateForKeys)'),
+      exclude: new RegExp('^(withRouter|Connect|ReduxForm|withContext|pure|' +
+        'onlyUpdateForKeys|AddDocument)'),
     }
   );
 }

@@ -10,33 +10,47 @@ import StyleLintPlugin from 'stylelint-webpack-plugin';
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
 
-const addHash = (template, hash) => {
-  if (globals.__PROD__) {
-    return template.replace(/\.[^.]+$/, `.[${hash}]$&`);
+const removeEmpty = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.filter(el => !!el);
   }
-  return `${template}?hash=[${hash}]`;
+  const result = {};
+  Object.keys(obj).forEach(key => {
+    if (key !== 'undefined') {
+      result[key] = obj[key];
+    }
+  });
+  return result;
 };
+const ifHot = (el = true, defEl) => (globals.__HMR__ ? el : defEl);
+const ifProd = (el = true, defEl) => (globals.__PROD__ ? el : defEl);
+
+const addHash = (template, hash) =>
+  ifProd(template.replace(/\.[^.]+$/, `.[${hash}]$&`), `${template}?hash=[${hash}]`);
 
 const webpackConfig = {
   name: 'client',
   target: 'web',
-  devtool: globals.__PROD__ ? 'source-map' : 'cheap-module-eval-source-map',
-  entry: {
-    app: [
+  bail: !!ifProd(),
+  devtool: ifProd('source-map', 'cheap-module-eval-source-map'),
+  entry: removeEmpty({
+    app: removeEmpty([
       'babel-polyfill',
       paths.src('index'),
-    ],
-  },
+      ifHot(`webpack-dev-server/client?${config.get('webpack_public_path')}`),
+      ifHot('webpack/hot/only-dev-server'),
+    ]),
+    [ifProd('vendor')]: config.get('vendor_dependencies'),
+  }),
   output: {
     path: `${paths.public('client')}`,
-    publicPath:
-      globals.__HMR__ ?
-      config.get('webpack_public_path') :
-      `${config.get('project_public_path')}/public/client/`,
-    filename: addHash('[name].js', globals.__PROD__ ? 'chunkhash' : 'hash'),
+    publicPath: ifHot(config.get('webpack_public_path'),
+      `${config.get('project_public_path')}/public/client/`),
+    filename: addHash('[name].js', ifProd('chunkhash', 'hash')),
     chunkFilename: addHash('[id].js', 'chunkhash'),
+    pathinfo: !ifProd(),
   },
-  plugins: [
+  plugins: removeEmpty([
     new webpack.DefinePlugin(Object.assign(globals, {
       'process.env': {
         NODE_ENV: JSON.stringify(config.get('env')),
@@ -48,11 +62,11 @@ const webpackConfig = {
     new HtmlWebpackPlugin({
       template: paths.src('index.html'),
       hash: true,
-      minify: globals.__PROD__ ? { collapseWhitespace: true } : false,
+      minify: ifProd({ collapseWhitespace: true }, false),
     }),
     new ExtractTextPlugin(
       addHash('[name].css', 'contenthash'),
-      { allChunks: true, disable: globals.__HMR__ }
+      { allChunks: true, disable: !!ifHot() }
     ),
     new webpack.ProvidePlugin({
       fetch: 'exports?window.fetch!whatwg-fetch',
@@ -61,9 +75,25 @@ const webpackConfig = {
       configFile: '.stylelintrc',
       context: paths.src(),
       files: '**/*.css',
-      failOnError: globals.__PROD__,
+      failOnError: !!ifProd(),
     }),
-  ],
+    ifHot(new webpack.HotModuleReplacementPlugin()),
+    ifProd(new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity,
+      filename: addHash('vendor.js', ifProd('chunkhash', 'hash')),
+    })),
+    ifProd(new webpack.NoErrorsPlugin()),
+    ifProd(new webpack.optimize.OccurrenceOrderPlugin(true)),
+    ifProd(new webpack.optimize.DedupePlugin()),
+    ifProd(new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        unused: true,
+        dead_code: true,
+        warnings: false,
+      },
+    })),
+  ]),
   resolve: {
     extensions: ['', '.js'],
   },
@@ -81,7 +111,7 @@ const webpackConfig = {
         include: paths.project(config.get('dir_src')),
         loader: 'babel',
         query: {
-          cacheDirectory: globals.__PROD__,
+          cacheDirectory: !!ifProd(),
           presets: ['es2015'],
           plugins: [
             'syntax-async-functions',
@@ -104,14 +134,19 @@ const webpackConfig = {
                 'transform-react-jsx',
                 'transform-regenerator',
                 'transform-object-rest-spread',
-                // must be an array with options object as second item
                 ['react-transform', {
-                  // must be an array of objects
-                  transforms: [{
-                    // you can have many transforms, not just one
-                    transform: 'react-transform-catch-errors',
-                    imports: ['react', 'redbox-react'],
-                  }],
+                  transforms: removeEmpty([
+                    ifHot({
+                      transform: 'react-transform-hmr',
+                      // see transform docs for "imports" and "locals" dependencies
+                      imports: ['react'],
+                      locals: ['module'],
+                    }),
+                    {
+                      transform: 'react-transform-catch-errors',
+                      imports: ['react', 'redbox-react'],
+                    },
+                  ]),
                   // by default we only look for `React.createClass` (and ES6 classes)
                   // but you can tell the plugin to look for different component factories:
                   // factoryMethods: ["React.createClass", "createClass"]
@@ -131,9 +166,9 @@ const webpackConfig = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract(
             'style',
-            `css?modules&importLoaders=1&localIdentName=${globals.__PROD__ ?
-              '[hash:base64]' :
-              '[name]---[local]---[hash:base64:5]'}!postcss`),
+            `css?modules&importLoaders=1&localIdentName=${ifProd(
+              '[hash:base64]',
+              '[name]---[local]---[hash:base64:5]')}!postcss`),
       },
       {
         test: /\.(png|jpg|gif|svg|ttf|eot|woff|woff2)$/,
@@ -152,62 +187,11 @@ const webpackConfig = {
   ],
   eslint: {
     configFile: paths.project('.eslintrc'),
-    failOnWarning: globals.__PROD__,
-    failOnError: globals.__PROD__,
+    failOnWarning: !!ifProd(),
+    failOnError: !!ifProd(),
     emitWarning: true,
     emitError: true,
   },
 };
-
-// ----------------------------------
-// Environment-Specific Defaults
-// ----------------------------------
-if (globals.__HMR__) {
-  webpackConfig.entry.app.push(
-    `webpack-dev-server/client?${config.get('webpack_public_path')}`,
-    'webpack/hot/only-dev-server'
-  );
-
-  webpackConfig.plugins.push(
-    new webpack.HotModuleReplacementPlugin()
-  );
-
-  webpackConfig.module.loaders.forEach(loader => {
-    if (loader.loader === 'babel') {
-      loader.query.env.development.plugins.forEach((plugin, index) => {
-        if (Array.isArray(plugin) && plugin[0] === 'react-transform') {
-          loader.query.env.development.plugins[index][1].transforms.push({
-            // can be an NPM module name or a local path
-            transform: 'react-transform-hmr',
-            // see transform docs for "imports" and "locals" dependencies
-            imports: ['react'],
-            locals: ['module'],
-          });
-        }
-      });
-    }
-  });
-}
-
-if (globals.__PROD__) {
-  webpackConfig.plugins = [...webpackConfig.plugins,
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity,
-      filename: addHash('vendor.js', globals.__PROD__ ? 'chunkhash' : 'hash'),
-    }),
-    new webpack.NoErrorsPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(true),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        unused: true,
-        dead_code: true,
-        warnings: false,
-      },
-    }),
-  ];
-  webpackConfig.entry.vendor = config.get('vendor_dependencies');
-}
 
 export default webpackConfig;

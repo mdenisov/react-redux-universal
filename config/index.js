@@ -52,7 +52,6 @@ config.set('vendor_dependencies', [
   'react-helmet',
   'react-redux',
   'react-router',
-  'react-addons-shallow-compare',
   'redux',
   'redux-thunk',
   'redux-saga',
@@ -61,6 +60,7 @@ config.set('vendor_dependencies', [
   'qs',
   'redux-form',
   'redux-form-schema',
+  'recompose',
 ]);
 
 // ------------------------------------

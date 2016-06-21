@@ -6,9 +6,13 @@ import StyleLintPlugin from 'stylelint-webpack-plugin';
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
 
+const removeEmpty = (obj) => obj.filter(el => !!el);
+const ifProd = (el = true, defEl) => (globals.__PROD__ ? el : defEl);
+
 const webpackConfig = {
   name: 'server',
   target: 'node',
+  bail: !!ifProd(),
   entry: {
     app: [
       paths.server('app'),
@@ -19,8 +23,9 @@ const webpackConfig = {
     path: paths.dist('server'),
     libraryTarget: 'commonjs2',
     filename: 'index.js',
+    pathinfo: true,
   },
-  plugins: [
+  plugins: removeEmpty([
     new webpack.DefinePlugin(Object.assign(globals, {
       __SERVER__: true,
       __CLIENT__: false,
@@ -33,9 +38,12 @@ const webpackConfig = {
       configFile: '.stylelintrc',
       context: paths.src(),
       files: '**/*.css',
-      failOnError: globals.__PROD__,
+      failOnError: !!ifProd(),
     }),
-  ],
+    ifProd(new webpack.NoErrorsPlugin()),
+    ifProd(new webpack.optimize.OccurrenceOrderPlugin()),
+    ifProd(new webpack.optimize.DedupePlugin()),
+  ]),
   resolve: {
     extensions: ['', '.js'],
   },
@@ -65,7 +73,7 @@ const webpackConfig = {
         ],
         loader: 'babel',
         query: {
-          cacheDirectory: globals.__PROD__,
+          cacheDirectory: !!ifProd(),
           presets: ['es2015'],
           plugins: [
             'syntax-async-functions',
@@ -93,9 +101,9 @@ const webpackConfig = {
       },
       {
         test: /\.css$/,
-        loader: `classes!css?modules&localIdentName=${globals.__PROD__ ?
-          '[hash:base64]' :
-          '[name]---[local]---[hash:base64:5]'}`,
+        loader: `classes!css?modules&localIdentName=${ifProd(
+          '[hash:base64]',
+          '[name]---[local]---[hash:base64:5]')}`,
       },
       {
         test: /\.(png|jpg|gif|svg|ttf|eot|woff|woff2)$/,
@@ -105,25 +113,11 @@ const webpackConfig = {
   },
   eslint: {
     configFile: paths.project('.eslintrc'),
-    failOnWarning: globals.__PROD__,
-    failOnError: globals.__PROD__,
+    failOnWarning: !!ifProd(),
+    failOnError: !!ifProd(),
     emitWarning: true,
     emitError: true,
   },
 };
-
-if (globals.__PROD__) {
-  webpackConfig.plugins = [...webpackConfig.plugins,
-    new webpack.NoErrorsPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.DedupePlugin(),
-  ];
-}
-
-if (globals.__DEV__) {
-  config.get('vendor_dependencies').forEach(dep => {
-    webpackConfig.plugins.push(new webpack.PrefetchPlugin(dep));
-  });
-}
 
 export default webpackConfig;

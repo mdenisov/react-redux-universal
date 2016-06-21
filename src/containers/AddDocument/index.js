@@ -5,23 +5,8 @@ import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
 import { cleanDocuments } from '../DocumentsList/modules/documents';
-import buildSchema from 'redux-form-schema';
 import { compose, getContext } from 'recompose';
-
-const schema = {
-  nameDocument: {
-    required: true,
-    validate: {
-      validNameDocument: (formValues, fieldValue) =>
-        new RegExp(`^${schema.nameDocument.regExp}$`).test(fieldValue),
-    },
-    // eslint-disable-next-line
-    regExp: `[А-Я]+[_\\s\(\)№""''0-9А-ЯЁа-яё]*`,
-    error: 'Наименование документа указано неверно',
-  },
-};
-
-const { fields, validate } = buildSchema(schema);
+import { schema, validate, fields } from './validate';
 
 class AddDocument extends React.Component {
   componentDidMount() {
@@ -114,12 +99,6 @@ AddDocument.propTypes = {
 
 AddDocument.defaultProps = {
   serverErrors: {},
-};
-
-AddDocument.formValidate = {
-  name: 'AddDocument',
-  method: 'POST',
-  validate,
 };
 
 export default compose(
