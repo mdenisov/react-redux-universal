@@ -5,7 +5,9 @@ import styles from './index.css';
 import { Link } from 'react-router';
 import documentsSaga from './modules/documents/sagas';
 import * as fromDocuments from './modules/reducer';
-import { compose, getContext, lifecycle } from 'recompose';
+import compose from 'recompose/compose';
+import getContext from 'recompose/getContext';
+import lifecycle from 'recompose/lifecycle';
 
 const DocumentsList = ({ documents, isLoading, error }) => (
   <div className={styles.w}>

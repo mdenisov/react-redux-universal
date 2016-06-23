@@ -5,7 +5,8 @@ import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
 import { cleanDocuments } from '../DocumentsList/modules/documents';
-import { compose, getContext } from 'recompose';
+import compose from 'recompose/compose';
+import getContext from 'recompose/getContext';
 import { schema, validate, fields } from './validate';
 
 class AddDocument extends React.Component {

@@ -3,7 +3,8 @@ import { extendRouter } from '../helpers/router';
 import { extendLocation } from '../helpers/location';
 import RouteTransition from '../components/RouteTransition';
 import { withRouter } from 'react-router';
-import { compose, withContext } from 'recompose';
+import compose from 'recompose/compose';
+import withContext from 'recompose/withContext';
 
 export default ({
     childContextTypes,
