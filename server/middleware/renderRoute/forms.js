@@ -80,6 +80,7 @@ const processingRequest = function* processingRequest(middlProps) {
         yield formsHandlers[formName].handler.call(this, thisMiddlProps);
         needRenderPage = false;
       }
+      break;
     }
   }
   if (needRenderPage) {
