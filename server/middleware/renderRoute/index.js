@@ -50,7 +50,6 @@ export default function* () {
           this.redirect(err.message);
           return;
         case 404:
-          this.statue = 404;
           return;
         default :
           logger(`Status code: ${err.statusCode} `, err.message || '');
