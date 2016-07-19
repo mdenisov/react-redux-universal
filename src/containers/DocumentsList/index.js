@@ -3,11 +3,13 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import styles from './index.css';
 import { Link } from 'react-router';
-import documentsSaga from './modules/documents/sagas';
-import * as fromDocuments from './modules/reducer';
+import * as fromDocuments from '../../redux/modules/reducer';
 import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
 import lifecycle from 'recompose/lifecycle';
+// import createListeningSagas from '../../helpers/createListeningSagas';
+import { startLoadDocuments, errorLoadDocuments, finishLoadDocuments }
+  from '../../redux/modules/documents/index';
 
 const DocumentsList = ({ documents, isLoading, error }) => (
   <div className={styles.w}>
@@ -26,14 +28,14 @@ const DocumentsList = ({ documents, isLoading, error }) => (
           </tr>
         </thead>
         <tbody>
-          {[...documents].map(document => (
-            <tr key={document[0]}>
+          {documents.map((document, index) => (
+            <tr key={index}>
               <td>
-                {document[1].get('docDate').split('-').reverse().
+                {document.docDate.split('-').reverse().
                 join('.')}
               </td>
               <td>
-                <Link to="documentInfo">{document[1].get('displayName')}</Link>
+                <Link to="documentInfo">{document.displayName}</Link>
               </td>
             </tr>
           ))}
@@ -44,7 +46,7 @@ const DocumentsList = ({ documents, isLoading, error }) => (
 );
 
 DocumentsList.propTypes = {
-  documents: PropTypes.object,
+  documents: PropTypes.array,
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.string,
 };
@@ -59,13 +61,31 @@ export default compose(
     instanceStore: PropTypes.object,
     fullApiPath: PropTypes.string,
   }),
+  // createListeningSagas('documents/TEST_ACTION'),
   lifecycle({
     componentWillMount() {
-      const { documents, error, instanceStore, fullApiPath } = this.props;
+      const { documents, error, instanceStore, fullApiPath,
+      /* subscribeListeningSagas*/ } = this.props;
+
+      /* subscribeListeningSagas('documents/TEST_ACTION', (params) => {
+        console.log(params);
+      });
+
+      setTimeout(() => {
+        instanceStore.store.dispatch({
+          type: 'documents/TEST_ACTION',
+          payload: 'test',
+        });
+      }, 5000);*/
 
       if (!documents && !error) {
         // Run our sagas
-        instanceStore.runSaga(documentsSaga, { apiPath: fullApiPath });
+        instanceStore.fetchData({
+          startAction: startLoadDocuments,
+          errorAction: errorLoadDocuments,
+          finishAction: finishLoadDocuments,
+          url: `${fullApiPath}/getDocuments`,
+        });
       }
     },
   })

@@ -4,7 +4,7 @@ import styles from './index.css';
 import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
-import { cleanDocuments } from '../DocumentsList/modules/documents';
+import { cleanDocuments } from '../../redux/modules/documents';
 import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
 import { schema, validate, fields } from './validate';

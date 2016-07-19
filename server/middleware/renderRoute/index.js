@@ -3,15 +3,20 @@ import { logger } from '../../helpers/logger';
 import renderRoute from './renderRoute';
 import forms from './forms';
 import addDocument from './formsHandlers/addDocument';
+import { bindActionCreators } from 'redux';
 
 const paths = config.get('utils_paths');
-const { matchRoute, configureStore, HttpError } = require(paths.dist('server'));
+const { matchRoute, configureStore, HttpError, sagaFetchData,
+  fetchData } = require(paths.dist('server'));
 
 // ------------------------------------
 // Rendering Middleware
 // ------------------------------------
 export default function* () {
   const instanceStore = configureStore();
+  // Run saga for fetch data
+  instanceStore.runSaga(sagaFetchData);
+  instanceStore.fetchData = bindActionCreators(fetchData, instanceStore.store.dispatch);
   const basename = config.get('project_public_path');
   const apiPath = `${config.get('project_public_path')}${config.get('api_path')}`;
   const fullApiPath = `http://${config.get('server_host')}:${config.get('server_port')}${apiPath}`;
@@ -45,7 +50,7 @@ export default function* () {
           this.redirect(err.message);
           return;
         case 404:
-          this.redirect(`${basename}/`);
+          this.statue = 404;
           return;
         default :
           logger(`Status code: ${err.statusCode} `, err.message || '');

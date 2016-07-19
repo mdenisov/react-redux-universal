@@ -2,7 +2,7 @@
 import { END } from 'redux-saga';
 
 export function extendStore(instanceStore, sagaMiddleware) {
-  const regStrSagaID = '([a-zA-Z0-9_]+\\/[a-zA-Z0-9_]+)+';
+  const regStrSagaID = '^((@@)?[a-zA-Z0-9_]+\\/[a-zA-Z0-9_]+)+$';
   const regSagaID = new RegExp(regStrSagaID);
   const launchedSagas = {};
   instanceStore.runSaga = (saga, ...args) => {

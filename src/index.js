@@ -8,6 +8,8 @@ import useScroll from 'react-router-scroll';
 import { deserializeJavascript } from './helpers/redux';
 import { Provider } from 'react-redux';
 import createHistory from 'history/lib/createBrowserHistory';
+import sagaFetchData, { fetchData } from './helpers/sagaFetchData';
+import { bindActionCreators } from 'redux';
 
 // check unnecessary re-renders
 if (__DEV__) {
@@ -44,6 +46,9 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
   // Recreate store with initial state from server
   instanceStore = configureStore(deserializeJavascript(initialState), instanceStore.getReducers());
   createRoutesParams.instanceStore = instanceStore;
+  // Run saga for fetch data
+  instanceStore.runSaga(sagaFetchData);
+  instanceStore.fetchData = bindActionCreators(fetchData, instanceStore.store.dispatch);
 
   // Create router (map routes)
   const routerInst = (
