@@ -12,19 +12,24 @@
     "_compile:server:watch": "webpack --config webpack.config-server.js --watch --watch-aggregate-timeout 100",
     "_start:server": "node bin/server",
     "_start:dev-server": "node bin/webpack-dev-server",
-    "lint": "eslint src/**/*.js src/*.js server/*.js server/**/*.js config/*.js config/**/*.js build/*.js build/**/*.js",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:flow",
+    "lint:js": "eslint src/**/*.js src/*.js server/*.js server/**/*.js config/*.js config/**/*.js build/*.js build/**/*.js",
+    "lint:css": "stylelint src/**/*.css",
+    "lint:flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint:staged": "lint-staged",
     "dev": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client && npm run _compile:server && concurrently --kill-others \"npm run _compile:client:watch\" \"npm run _compile:server:watch\" \"npm run _start:server\"",
     "watch": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr && npm run _compile:server -- --hmr && concurrently --kill-others \"npm run _compile:server:watch -- --hmr\" \"npm run _start:dev-server -- --hmr\" \"npm run _start:server -- --hmr\"",
     "watch:logger": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr --no_debug --redux_logger && npm run _compile:server -- --hmr --no_debug --redux_logger && concurrently --kill-others \"npm run _compile:server:watch -- --hmr --no_debug --redux_logger\" \"npm run _start:dev-server -- --hmr --no_debug --redux_logger\" \"npm run _start:server -- --hmr --no_debug --redux_logger\"",
-    "start": "npm run watch",
-    "flow": "flow; test $? -eq 0 -o $? -eq 2"
+    "start": "npm run watch"
   },
   "lint-staged": {
-    "eslint": "*.js",
-    "stylelint": "*.css"
+    "*.js": "lint:js",
+    "*.css": "lint:css"
   },
-  "pre-commit": "lint:staged",
+  "pre-commit": [
+    "lint:staged",
+    "lint:flow"
+  ],
   "author": "Aleksandr Efremov <eav@bystrobank.ru>",
   "license": "MIT",
   "engines": {
@@ -61,6 +66,7 @@
     "concurrently": "^2.1.0",
     "css-loader": "^0.23.1",
     "debug": "^2.2.0",
+    "empty": "^0.10.1",
     "eslint": "^2.0.0",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-loader": "^1.3.0",
@@ -115,7 +121,6 @@
     "yargs": "^4.7.1"
   },
   "devDependencies": {
-    "empty": "^0.10.1",
     "piping": "^0.3.2",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",

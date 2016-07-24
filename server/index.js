@@ -28,8 +28,9 @@ if (globals.__DEV__) {
 
   // Serve function
   const serveStatic = (root, opts = {}, baseName = '') => {
-    opts.root = path.resolve(root);
-    if (opts.index !== false) opts.index = opts.index || 'index.html';
+    const newOpts = { ...opts };
+    newOpts.root = path.resolve(root);
+    if (newOpts.index !== false) newOpts.index = newOpts.index || 'index.html';
     return function *serve(next) {
       if (this.method === 'HEAD' || this.method === 'GET') {
         let servePath = this.path;
@@ -37,7 +38,7 @@ if (globals.__DEV__) {
             this.path.indexOf(baseName) === 0) {
           servePath = this.path.substr(baseName.length);
         }
-        if (yield send(this, servePath, opts)) return;
+        if (yield send(this, servePath, newOpts)) return;
       }
       yield* next;
     };
