@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { take } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 
 const regActionStr = '([a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)?)+';
 const regAction = new RegExp(regActionStr);
@@ -29,8 +29,9 @@ const createListeningSagas = actions => WrappedComponent => {
         this.actionListeners[action] = [];
         const self = this;
         function* listenAction() {
-          const data = yield take(action);
-          self.actionListeners[action].forEach(cb => cb(data));
+          yield* takeEvery(action, (data) => {
+            self.actionListeners[action].forEach(cb => cb(data));
+          });
         }
         listenAction.sagaID = `listen_${action}`;
         instanceStore.runSaga(listenAction);

@@ -26,27 +26,28 @@ const ifHot = (el = true, defEl) => (globals.__HMR__ ? el : defEl);
 const ifProd = (el = true, defEl) => (globals.__PROD__ ? el : defEl);
 
 const addHash = (template, hash) =>
-  ifProd(template.replace(/\.[^.]+$/, `.[${hash}]$&`), `${template}?hash=[${hash}]`);
+  ifProd(template.replace(/\.[^.]+$/, `.[${hash}]$&`),
+    ifHot(template, `${template}?hash=[${hash}]`));
 
 const webpackConfig = {
   name: 'client',
   target: 'web',
   bail: !!ifProd(),
   devtool: ifProd('source-map', 'cheap-module-eval-source-map'),
-  entry: removeEmpty({
+  entry: {
     app: removeEmpty([
       'babel-polyfill',
       paths.src('index'),
       ifHot(`webpack-dev-server/client?${config.get('webpack_public_path')}`),
       ifHot('webpack/hot/only-dev-server'),
     ]),
-    [ifProd('vendor')]: config.get('vendor_dependencies'),
-  }),
+    vendor: config.get('vendor_dependencies'),
+  },
   output: {
     path: `${paths.public('client')}`,
     publicPath: ifHot(config.get('webpack_public_path'),
       `${config.get('project_public_path')}/public/client/`),
-    filename: addHash('[name].js', ifProd('chunkhash', 'hash')),
+    filename: addHash('[name].js', 'chunkhash'),
     chunkFilename: addHash('[id].js', 'chunkhash'),
     pathinfo: !ifProd(),
   },
@@ -62,7 +63,18 @@ const webpackConfig = {
     new HtmlWebpackPlugin({
       template: paths.src('index.html'),
       hash: true,
-      minify: ifProd({ collapseWhitespace: true }, false),
+      minify: ifProd({
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      }, false),
     }),
     new ExtractTextPlugin(
       addHash('[name].css', 'contenthash'),
@@ -78,11 +90,11 @@ const webpackConfig = {
       failOnError: !!ifProd(),
     }),
     ifHot(new webpack.HotModuleReplacementPlugin()),
-    ifProd(new webpack.optimize.CommonsChunkPlugin({
+    new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity,
-      filename: addHash('vendor.js', ifProd('chunkhash', 'hash')),
-    })),
+      filename: addHash('vendor.js', 'chunkhash'),
+    }),
     ifProd(new webpack.NoErrorsPlugin()),
     ifProd(new webpack.optimize.OccurrenceOrderPlugin(true)),
     ifProd(new webpack.optimize.DedupePlugin()),
@@ -122,18 +134,11 @@ const webpackConfig = {
             'transform-react-jsx',
             'transform-regenerator',
             'transform-object-rest-spread',
+            'transform-flow-strip-types',
           ],
           env: {
             development: {
               plugins: [
-                'syntax-async-functions',
-                'syntax-export-extensions',
-                'syntax-jsx',
-                'transform-class-properties',
-                'transform-export-extensions',
-                'transform-react-jsx',
-                'transform-regenerator',
-                'transform-object-rest-spread',
                 ['react-transform', {
                   transforms: removeEmpty([
                     ifHot({

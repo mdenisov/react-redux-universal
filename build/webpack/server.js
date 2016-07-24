@@ -14,9 +14,7 @@ const webpackConfig = {
   target: 'node',
   bail: !!ifProd(),
   entry: {
-    app: [
-      paths.server('app'),
-    ],
+    app: paths.server('app'),
   },
   externals: fs.readdirSync('node_modules').filter(module => module !== '.bin'),
   output: {
@@ -84,6 +82,7 @@ const webpackConfig = {
             'transform-react-jsx',
             'transform-regenerator',
             'transform-object-rest-spread',
+            'transform-flow-strip-types',
             ['transform-runtime', {
               polyfill: false,
               regenerator: true,

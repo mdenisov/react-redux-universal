@@ -41,7 +41,8 @@ const processingRequest = function* processingRequest(middlProps) {
     formData = this.request.body;
   }
   const transferHeaderIsForm = this.request.headers['content-type'] &&
-    this.request.headers['content-type'].indexOf('application/x-www-form-urlencoded') !== -1;
+    (this.request.headers['content-type'].indexOf('application/x-www-form-urlencoded') !== -1 ||
+    this.request.headers['content-type'].indexOf('multipart/form-data') !== -1);
 
   const forms = Object.keys(formsHandlers);
   for (let i = 0; i < forms.length; i++) {
@@ -50,7 +51,8 @@ const processingRequest = function* processingRequest(middlProps) {
     // Check transfer form
     if (formData[formName] !== undefined &&
       this.request.method.toLowerCase() === propValidate.method.toLowerCase() &&
-      (transferHeaderIsForm || checkPathMatch(propValidate.url, this.request.path))) {
+      ((transferHeaderIsForm && !propValidate.url) ||
+        checkPathMatch(propValidate.url, this.request.path))) {
       // collect values form fields
       thisMiddlProps.componentProps.initialValues = {};
       Object.keys(formData).forEach((param) => {
