@@ -1,4 +1,3 @@
-// @flow
 import { createReducer } from '../../../helpers/redux';
 
 export const START_LOAD_DOCUMENTS = 'documentsList/documents/START_LOAD_DOCUMENTS';

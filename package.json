@@ -12,10 +12,11 @@
     "_compile:server:watch": "webpack --config webpack.config-server.js --watch --watch-aggregate-timeout 100",
     "_start:server": "node bin/server",
     "_start:dev-server": "node bin/webpack-dev-server",
-    "lint": "npm run lint:js && npm run lint:css && npm run lint:flow",
-    "lint:js": "eslint src/**/*.js src/*.js server/*.js server/**/*.js config/*.js config/**/*.js build/*.js build/**/*.js",
+    "lint": "npm run lint:js && npm run lint:css && npm run flow",
+    "lint:js": "eslint src server config build",
     "lint:css": "stylelint src/**/*.css",
-    "lint:flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "lint:flow": "flow",
     "lint:staged": "lint-staged",
     "dev": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client && npm run _compile:server && concurrently --kill-others \"npm run _compile:client:watch\" \"npm run _compile:server:watch\" \"npm run _start:server\"",
     "watch": "export DEBUG=app:* PROJECT_PATH= && npm run clean && npm run _compile:client -- --hmr && npm run _compile:server -- --hmr && concurrently --kill-others \"npm run _compile:server:watch -- --hmr\" \"npm run _start:dev-server -- --hmr\" \"npm run _start:server -- --hmr\"",
@@ -23,8 +24,8 @@
     "start": "npm run watch"
   },
   "lint-staged": {
-    "*.js": "lint:js",
-    "*.css": "lint:css"
+    "*.js": "eslint",
+    "*.css": "stylelint"
   },
   "pre-commit": [
     "lint:staged",
