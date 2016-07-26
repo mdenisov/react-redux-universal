@@ -1,16 +1,14 @@
-import buildSchema from 'redux-form-schema';
+// eslint-disable-next-line
+export const regNameDocument = `[А-Я]+[_\\s\(\)№"'0-9А-ЯЁа-яё]*`;
 
-export const schema = {
-  nameDocument: {
-    required: true,
-    validate: {
-      validNameDocument: (formValues, fieldValue) =>
-        new RegExp(`^${schema.nameDocument.regExp}$`).test(fieldValue),
-    },
-    // eslint-disable-next-line
-    regExp: `[А-Я]+[_\\s\(\)№""''0-9А-ЯЁа-яё]*`,
-    error: 'Наименование документа указано неверно',
-  },
+const validate = (values) => {
+  const errors = {};
+  if (!values.nameDocument) {
+    errors.nameDocument = 'Необходимо заполнить';
+  } else if (!(new RegExp(`^${regNameDocument}$`)).test(values.nameDocument)) {
+    errors.nameDocument = 'Указано неверно';
+  }
+  return errors;
 };
 
-export const { fields, validate } = buildSchema(schema);
+export default validate;

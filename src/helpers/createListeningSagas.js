@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
 import { takeEvery } from 'redux-saga';
+import genUUIDv4 from './genUUIDv4';
 
-const regActionStr = '([a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)?)+';
+const regActionStr = '^@{0,2}[a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)*$';
 const regAction = new RegExp(regActionStr);
 
 const createListeningSagas = actions => WrappedComponent => {
@@ -33,7 +34,7 @@ const createListeningSagas = actions => WrappedComponent => {
             self.actionListeners[action].forEach(cb => cb(data));
           });
         }
-        listenAction.sagaID = `listen_${action}`;
+        listenAction.sagaID = `${action}/${genUUIDv4().replace(/-/g, '_')}`;
         instanceStore.runSaga(listenAction);
       });
     }

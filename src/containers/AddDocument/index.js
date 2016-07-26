@@ -7,7 +7,7 @@ import Helmet from 'react-helmet';
 import { cleanDocuments } from '../../redux/modules/documents';
 import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
-import { schema, validate, fields } from './validate';
+import validate, { regNameDocument } from './validate';
 
 class AddDocument extends React.Component {
   componentDidMount() {
@@ -29,8 +29,9 @@ class AddDocument extends React.Component {
         },
         body: data,
       });
-      if (response.status !== 200) {
+      if (!response || response.status !== 200) {
         reject({ _error: 'Внутренняя ошибка сервера' });
+        return;
       }
       this.props.cleanDocuments();
       resolve(this.props.router.push('/'));
@@ -57,8 +58,8 @@ class AddDocument extends React.Component {
               name="nameDocument"
               type="text"
               placeholder="Наименование документа"
-              required={schema.nameDocument.required}
-              pattern={schema.nameDocument.regExp}
+              required="true"
+              pattern={regNameDocument}
               {...nameDocument}
             />
             {nameDocument.touched && nameDocument.error &&
@@ -105,7 +106,7 @@ AddDocument.defaultProps = {
 export default compose(
   reduxForm({
     form: 'AddDocument',
-    fields,
+    fields: ['nameDocument'],
     validate,
   }, null, {
     cleanDocuments,
@@ -113,5 +114,5 @@ export default compose(
   getContext({
     router: React.PropTypes.object,
     location: React.PropTypes.object,
-  })
+  }),
 )(AddDocument);

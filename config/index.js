@@ -59,7 +59,6 @@ config.set('vendor_dependencies', [
   'react-router-scroll',
   'qs',
   'redux-form',
-  'redux-form-schema',
   'recompose',
 ]);
 

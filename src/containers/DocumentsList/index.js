@@ -88,5 +88,5 @@ export default compose(
         });
       }
     },
-  })
+  }),
 )(DocumentsList);

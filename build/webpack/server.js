@@ -72,7 +72,7 @@ const webpackConfig = {
         loader: 'babel',
         query: {
           cacheDirectory: !!ifProd(),
-          presets: ['es2015'],
+          presets: ['es2015', 'stage-3'],
           plugins: [
             'syntax-async-functions',
             'syntax-export-extensions',

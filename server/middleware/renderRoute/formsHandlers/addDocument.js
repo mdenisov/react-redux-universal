@@ -1,6 +1,6 @@
 import { readFilePromise, writeFilePromise } from '../../../helpers/fs';
 import path from 'path';
-import { validate } from '../../../../src/containers/AddDocument/validate';
+import validate from '../../../../src/containers/AddDocument/validate';
 
 // Handler form AddDocument
 const handler = function* handler({ requestFromFetchAPI }) {
