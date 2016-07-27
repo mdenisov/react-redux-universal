@@ -1,5 +1,4 @@
 {
-  "presets": ["stage-3"],
   "plugins": [
     "transform-es2015-modules-commonjs",
     "transform-es2015-parameters",
@@ -11,6 +10,8 @@
     "transform-export-extensions",
     "transform-object-rest-spread",
     "transform-flow-strip-types",
+    "transform-exponentiation-operator",
+    "syntax-trailing-function-commas",
     ["transform-runtime", {
       "polyfill": false,
       "regenerator": true,

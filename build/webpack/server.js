@@ -72,7 +72,7 @@ const webpackConfig = {
         loader: 'babel',
         query: {
           cacheDirectory: !!ifProd(),
-          presets: ['es2015', 'stage-3'],
+          presets: ['es2015'],
           plugins: [
             'syntax-async-functions',
             'syntax-export-extensions',
@@ -83,6 +83,8 @@ const webpackConfig = {
             'transform-regenerator',
             'transform-object-rest-spread',
             'transform-flow-strip-types',
+            'transform-exponentiation-operator',
+            'syntax-trailing-function-commas',
             ['transform-runtime', {
               polyfill: false,
               regenerator: true,
