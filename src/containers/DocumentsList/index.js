@@ -65,18 +65,23 @@ export default compose(
   lifecycle({
     componentWillMount() {
       const { documents, error, instanceStore, fullApiPath,
-      /* subscribeListeningSagas*/ } = this.props;
+      /* subscribeListeningSagas */} = this.props;
 
-      /* subscribeListeningSagas('documents/TEST_ACTION', (params) => {
-        console.log(params);
+      /* subscribeListeningSagas('documents/TEST_ACTION', function* cb(params) {
+        console.log('start');
+        yield new Promise(resolve => {
+          setTimeout(() => {
+            console.log(params);
+            resolve();
+          }, 3000);
+        });
+        console.log('finish');
       });
 
-      setTimeout(() => {
-        instanceStore.store.dispatch({
-          type: 'documents/TEST_ACTION',
-          payload: 'test',
-        });
-      }, 5000);*/
+      instanceStore.store.dispatch({
+        type: 'documents/TEST_ACTION',
+        payload: 'test',
+      });*/
 
       if (!documents && !error) {
         // Run our sagas

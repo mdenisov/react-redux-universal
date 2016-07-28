@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { takeEvery } from 'redux-saga';
+import { call } from 'redux-saga/effects';
 import genUUIDv4 from './genUUIDv4';
 
 const regActionStr = '^@{0,2}[a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)*$';
@@ -30,8 +31,8 @@ const createListeningSagas = actions => WrappedComponent => {
         this.actionListeners[action] = [];
         const self = this;
         function* listenAction() {
-          yield* takeEvery(action, (data) => {
-            self.actionListeners[action].forEach(cb => cb(data));
+          yield* takeEvery(action, function* runActionListeners(data) {
+            yield self.actionListeners[action].map(cb => call(cb, data));
           });
         }
         listenAction.sagaID = `${action}/${genUUIDv4().replace(/-/g, '_')}`;
