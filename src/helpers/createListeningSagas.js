@@ -20,6 +20,7 @@ const createListeningSagas = actions => WrappedComponent => {
       super(props);
       this.actionListeners = {};
       this.subscribeListeningSagas = this.subscribeListeningSagas.bind(this);
+      this.launchedSagas = [];
     }
 
     componentWillMount() {
@@ -36,16 +37,14 @@ const createListeningSagas = actions => WrappedComponent => {
           });
         }
         listenAction.sagaID = `${action}/${genUUIDv4().replace(/-/g, '_')}`;
-        instanceStore.runSaga(listenAction);
+        this.launchedSagas.push(instanceStore.runSaga(listenAction));
       });
     }
 
     componentWillUnmount() {
-      const { instanceStore } = this.context;
-      _actions.forEach(action => {
-        instanceStore.stopSagaByName(`listen_${action}`);
-      });
-      this.actionListeners = null;
+      this.launchedSagas.forEach(launchedSaga => launchedSaga.cancel());
+      this.actionListeners = {};
+      this.launchedSagas = [];
     }
 
     subscribeListeningSagas(action, cb) {

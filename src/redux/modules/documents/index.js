@@ -9,18 +9,19 @@ export const cleanDocuments = () => ({
   type: CLEAN_DOCUMENTS,
 });
 
-export const startLoadDocuments = () => ({
-  type: START_LOAD_DOCUMENTS,
-});
-
-export const errorLoadDocuments = (response, ex) => ({
-  type: ERROR_LOAD_DOCUMENTS,
-  error: response.statusText || ex && ex.message || '',
-});
-
-export const finishLoadDocuments = (documents) => ({
-  type: FINISH_LOAD_DOCUMENTS,
-  documents,
+export const fetchData = (apiPath) => ({
+  startAction: () => ({
+    type: START_LOAD_DOCUMENTS,
+  }),
+  errorAction: (response, ex) => ({
+    type: ERROR_LOAD_DOCUMENTS,
+    error: response.statusText || ex && ex.message || '',
+  }),
+  finishAction: (documents) => ({
+    type: FINISH_LOAD_DOCUMENTS,
+    documents,
+  }),
+  url: `${apiPath}/getDocuments`,
 });
 
 export const getDocuments = (state) =>
@@ -45,6 +46,5 @@ export default createReducer(initialState, {
     ({ ...state, loading: false, value: action.documents }),
   [ERROR_LOAD_DOCUMENTS]: (state, action) =>
     ({ ...state, loading: false, error: action.error }),
-  [CLEAN_DOCUMENTS]: (state) =>
-    ({ ...state, ...initialState }),
+  [CLEAN_DOCUMENTS]: () => initialState,
 });

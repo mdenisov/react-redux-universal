@@ -1,11 +1,7 @@
-import { call, put, take } from 'redux-saga/effects';
+import { call, put } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 
 const FETCH_DATA = '@@APP/FETCH_DATA';
-
-export const fetchData = (args) => ({
-  type: FETCH_DATA,
-  ...args,
-});
 
 const checkAction = (action, actionName) => {
   if (typeof action !== 'function') {
@@ -13,38 +9,43 @@ const checkAction = (action, actionName) => {
   }
 };
 
-export default function* _fetchData() {
-  while (true) { // eslint-disable-line
-    // wait action fetchData
-    const { url, fetchOptions, startAction, errorAction, finishAction } = yield take(FETCH_DATA);
+function* _fetchData({ url, fetchOptions, startAction, errorAction, finishAction }) {
+  // Check action payload
+  if (typeof url !== 'string') {
+    throw new Error('URL shall be string');
+  }
+  checkAction(startAction, 'startAction');
+  checkAction(errorAction, 'errorAction');
+  checkAction(finishAction, 'finishAction');
 
-    // Check action payload
-    if (typeof url !== 'string') {
-      throw new Error('URL shall be string');
-    }
-    checkAction(startAction, 'startAction');
-    checkAction(errorAction, 'errorAction');
-    checkAction(finishAction, 'finishAction');
-
-    // Dispatch startAction
-    yield put(startAction());
-    // Run fetch request
-    const response = yield call(fetch, url, fetchOptions);
-    // If error then dispatch errorAction
-    if (!response || response.status !== 200) {
-      yield put(errorAction(response));
-      continue;
-    }
-    // Parse response-json
-    try {
-      const result = yield response.json();
-      // Dispatch finishAction with results
-      yield put(finishAction(result));
-    } catch (ex) {
-      // If error parse json then dispatch errorAction
-      yield put(errorAction(response, ex));
-      continue;
-    }
+  // Dispatch startAction
+  yield put(startAction());
+  // Run fetch request
+  const response = yield call(fetch, url, fetchOptions);
+  // If error then dispatch errorAction
+  if (!response || response.status !== 200) {
+    yield put(errorAction(response));
+    return;
+  }
+  // Parse response-json
+  try {
+    const result = yield response.json();
+    // Dispatch finishAction with results
+    yield put(finishAction(result));
+  } catch (ex) {
+    // If error parse json then dispatch errorAction
+    yield put(errorAction(response, ex));
+    return;
   }
 }
-_fetchData.sagaID = FETCH_DATA;
+
+export default function* fetchSaga() {
+  // wait action fetchData
+  yield takeEvery(FETCH_DATA, _fetchData);
+}
+fetchSaga.sagaID = FETCH_DATA;
+
+export const fetchData = (args) => ({
+  type: FETCH_DATA,
+  ...args,
+});

@@ -8,8 +8,7 @@ import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
 import lifecycle from 'recompose/lifecycle';
 // import createListeningSagas from '../../helpers/createListeningSagas';
-import { startLoadDocuments, errorLoadDocuments, finishLoadDocuments }
-  from '../../redux/modules/documents/index';
+import { fetchData as fetchDocuments } from '../../redux/modules/documents/index';
 
 const DocumentsList = ({ documents, isLoading, error }) => (
   <div className={styles.w}>
@@ -85,12 +84,7 @@ export default compose(
 
       if (!documents && !error) {
         // Run our sagas
-        instanceStore.fetchData({
-          startAction: startLoadDocuments,
-          errorAction: errorLoadDocuments,
-          finishAction: finishLoadDocuments,
-          url: `${fullApiPath}/getDocuments`,
-        });
+        instanceStore.fetchData(fetchDocuments(fullApiPath));
       }
     },
   }),
