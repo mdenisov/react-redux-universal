@@ -10,8 +10,7 @@ const server = new WebpackDevServer(webpack(webpackConfig), {
   hot: true,
   https: false,
   inline: true,
-  quiet: false,
-  noInfo: true,
+  quiet: true,
   lazy: false,
   stats: {
     colors: true,

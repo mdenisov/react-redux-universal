@@ -1,10 +1,11 @@
 require('babel-register');
+require('regenerator-runtime/runtime');
 
 const server = require('../server').default;
 const config = require('../config').default;
 
 if (config.get('globals').__DEV__) {
-  if (!require('piping')({
+  if (!require('piping')({ // eslint-disable-line
     hook: true,
     ignore: /(\/\.|~$|\.json)/i,
   })) {

@@ -1,18 +1,17 @@
 {
+  "presets": ["es2016", "react"],
   "plugins": [
     "transform-es2015-modules-commonjs",
     "transform-es2015-parameters",
     "transform-es2015-destructuring",
     "transform-es2015-spread",
-    "transform-react-jsx",
-    "syntax-jsx",
+    "syntax-async-functions",
     "transform-class-properties",
     "transform-export-extensions",
     "transform-object-rest-spread",
-    "transform-flow-strip-types",
-    "transform-exponentiation-operator",
     "syntax-trailing-function-commas",
     ["transform-runtime", {
+      "helpers": false,
       "polyfill": false,
       "regenerator": true,
     }],
