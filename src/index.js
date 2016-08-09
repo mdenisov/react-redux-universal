@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import configureStore from './redux/init';
 import createRoutes from './routes';
 import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-router';
-import useScroll from 'react-router-scroll';
+import { useScroll } from 'react-router-scroll';
 import { deserializeJavascript } from './helpers/redux';
 import { Provider } from 'react-redux';
 import createHistory from 'history/lib/createBrowserHistory';

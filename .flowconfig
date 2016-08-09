@@ -3,5 +3,8 @@
 .*/node_modules/batchflow/.*
 
 [options]
-module.name_mapper='.*\(.css\)' -> 'empty/object'
 esproposal.class_static_fields=enable
+esproposal.class_instance_fields=enable
+
+module.name_mapper='^\(.*\)\.css$' -> 'empty/object'
+module.name_mapper='^\(.*\)\.\(jpg\|png\|gif\|eot\|svg\|ttf\|woff\|woff2\|mp4\|webm\)$' -> 'empty/object'

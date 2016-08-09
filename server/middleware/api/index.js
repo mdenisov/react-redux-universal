@@ -12,7 +12,19 @@ router.get(`${config.get('project_public_path')}/api/getDocuments`, function* ge
   const documentsJSON = yield httpGetPromise({
     src: 'http://tomcat-bystrobank.rhcloud.com/jparestresource/web/documents',
   });
-  const documents = JSON.parse(documentsJSON);
+  type DocumentType = {
+    id: number,
+    displayName: string,
+    description: string,
+    docDate: string,
+    direction: string,
+  };
+  type DocumentsType = {
+    documents: {
+      document: Array<DocumentType>,
+    }
+  }
+  const documents: DocumentsType = JSON.parse(documentsJSON);
   const documentsSorted = documents.documents.document.sort((a, b) => {
     const aDate = new Date(a.docDate);
     const bDate = new Date(b.docDate);
