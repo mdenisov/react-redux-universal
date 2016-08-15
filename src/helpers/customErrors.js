@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+
 function HttpError(code, msg) {
   this.message = msg;
   this.statusCode = code;

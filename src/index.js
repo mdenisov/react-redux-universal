@@ -1,18 +1,19 @@
 /* eslint-disable global-require */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-router';
+import { Provider } from 'react-redux';
+import { useScroll } from 'react-router-scroll';
+import createHistory from 'history/lib/createBrowserHistory';
+import { bindActionCreators } from 'redux';
 import configureStore from './redux/init';
 import createRoutes from './routes';
-import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-router';
-import { useScroll } from 'react-router-scroll';
 import { deserializeJavascript } from './helpers/redux';
-import { Provider } from 'react-redux';
-import createHistory from 'history/lib/createBrowserHistory';
 import sagaFetchData, { fetchData } from './helpers/sagaFetchData';
-import { bindActionCreators } from 'redux';
 
 // check unnecessary re-renders
 if (__DEV__) {
+  // eslint-disable-next-line
   require('why-did-you-update').default(
     React,
     {
@@ -67,6 +68,7 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
 
   if (__DEBUG__ && !window.devToolsExtension) {
     // Enable Redux dev tools in DEBUG mode
+    // eslint-disable-next-line
     const DevToolsView = require('./components/DevToolsView').default;
     const devNode = (
       <Provider store={instanceStore.store}>

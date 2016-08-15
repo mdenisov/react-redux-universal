@@ -1,12 +1,12 @@
 /* eslint-disable no-return-assign  */
 import React from 'react';
-import styles from './index.css';
 import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import Helmet from 'react-helmet';
-import { cleanDocuments } from '../../redux/modules/documents';
 import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
+import styles from './index.css';
+import { cleanDocuments } from '../../redux/modules/documents';
 import validate, { regNameDocument } from './validate';
 
 class AddDocument extends React.Component {

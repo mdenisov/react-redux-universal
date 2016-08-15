@@ -1,5 +1,5 @@
-import { httpGetPromise } from '../../helpers/http';
 import createRouter from 'koa-router';
+import { httpGetPromise } from '../../helpers/http';
 import config from '../../../config';
 
 const router = createRouter();

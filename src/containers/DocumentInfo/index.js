@@ -1,7 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import styles from './index.css';
 import { Link } from 'react-router';
+import styles from './index.css';
 
 const DocumentInfo = () => (
   <div className={styles.w}>

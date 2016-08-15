@@ -1,4 +1,5 @@
 import loaderUtils from 'loader-utils';
+
 module.exports = function classesLoader() {};
 module.exports.pitch = function pitch(remainingRequest) {
   if (this.cacheable) this.cacheable();

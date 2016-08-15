@@ -1,4 +1,4 @@
-import statuses from 'statuses';
+import statuses from 'statuses'; // eslint-disable-line
 
 const formsHandlers = {};
 const addFormHandler = (arg) => {
@@ -67,15 +67,12 @@ const processingRequest = function* processingRequest(middlProps) {
           // Call registered Form handler
           yield formsHandlers[formName].handler.call(this, thisMiddlProps);
           needRenderPage = false;
+        } else if (requestFromFetchAPI) { // FetchAPI request. Return HTTP code 450
+          statuses[450] = 'Error form data';
+          this.throw('Ошибки в данных формы', 450);
         } else {
-          // FetchAPI request. Return HTTP code 450
-          if (requestFromFetchAPI) {
-            statuses[450] = 'Error form data';
-            this.throw('Ошибки в данных формы', 450);
-          } else {
-            // JS off by client or JS errors (maybe old browser).
-            thisMiddlProps.componentProps.serverErrors = formErrors;
-          }
+          // JS off by client or JS errors (maybe old browser).
+          thisMiddlProps.componentProps.serverErrors = formErrors;
         }
       } else {
         // Call registered Form handler

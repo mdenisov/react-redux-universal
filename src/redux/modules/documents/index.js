@@ -15,7 +15,7 @@ export const fetchData = (apiPath) => ({
   }),
   errorAction: (response, ex) => ({
     type: ERROR_LOAD_DOCUMENTS,
-    error: response.statusText || ex && ex.message || '',
+    error: response.statusText || (ex && ex.message) || '',
   }),
   finishAction: (documents) => ({
     type: FINISH_LOAD_DOCUMENTS,

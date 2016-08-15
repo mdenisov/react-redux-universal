@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-import PageLoadProgressBar from './PageLoadProgressBar';
 import { withRouter } from 'react-router';
+import PageLoadProgressBar from './PageLoadProgressBar';
 
 class RouteTransition extends React.Component {
   constructor() {

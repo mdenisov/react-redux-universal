@@ -1,8 +1,8 @@
-import createRoutes from '../src/routes';
 import { match } from 'react-router';
+import createRoutes from '../src/routes';
 import { HttpError } from '../src/helpers/customErrors';
 
-export { extendLocation } from '../src/helpers/location';
+export extendLocation from '../src/helpers/extendLocation';
 export { default as configureStore } from '../src/redux/init';
 export * from '../src/helpers/customErrors.js';
 export sagaFetchData, { fetchData } from '../src/helpers/sagaFetchData';

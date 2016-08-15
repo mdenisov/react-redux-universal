@@ -1,9 +1,9 @@
+import { bindActionCreators } from 'redux';
 import config from '../../../config';
 import { logger } from '../../helpers/logger';
 import renderRoute from './renderRoute';
 import forms from './forms';
 import addDocument from './formsHandlers/addDocument';
-import { bindActionCreators } from 'redux';
 
 const paths = config.get('utils_paths');
 const { matchRoute, configureStore, HttpError, sagaFetchData,

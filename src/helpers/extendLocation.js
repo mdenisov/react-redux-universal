@@ -11,7 +11,7 @@ import { createPath } from './pathUtils';
  * @param  {Object} location объект
  * @return {Object} location расширенный объект location
  */
-export const extendLocation = (() =>
+const extendLocation = (() =>
   (location, params) => {
     const newLocation = Object.assign({}, location);
     newLocation.basename = newLocation.basename || '';
@@ -46,3 +46,5 @@ export const extendLocation = (() =>
     return newLocation;
   }
 )();
+
+export default extendLocation;

@@ -1,13 +1,14 @@
 import koa from 'koa';
-import config from '../config';
 import bodyParser from 'koa-bodyparser';
 import path from 'path';
 import logger from 'koa-logger';
-import renderRoute from './middleware/renderRoute';
-import router from './middleware/api';
 import compress from 'koa-compress';
 import favicon from 'koa-favicon';
 import send from 'koa-send';
+import config from '../config';
+import renderRoute from './middleware/renderRoute';
+import router from './middleware/api';
+
 
 const globals = config.get('globals');
 const app = koa();
@@ -31,7 +32,7 @@ if (globals.__DEV__) {
     const newOpts = { ...opts };
     newOpts.root = path.resolve(root);
     if (newOpts.index !== false) newOpts.index = newOpts.index || 'index.html';
-    return function *serve(next) {
+    return function* serve(next) {
       if (this.method === 'HEAD' || this.method === 'GET') {
         let servePath = this.path;
         if (baseName.length &&

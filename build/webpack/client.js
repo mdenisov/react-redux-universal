@@ -1,11 +1,11 @@
 import webpack from 'webpack';
-import config from '../../config';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import cssnext from 'postcss-cssnext';
 import postcssFocus from 'postcss-focus';
 import postcssReporter from 'postcss-reporter';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
+import config from '../../config';
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');

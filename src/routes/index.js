@@ -27,8 +27,8 @@ export default (params) => {
           (location, callback) => {
             require.ensure([], (require) => {
               instanceStore.registerReducer(
-                require('../redux/modules/reducer').default
-              );
+                require('../redux/modules/reducer').default,
+              ); // eslint-disable-line
               if (__HMR__ && module.hot) { // Hot reloading reducer
                 module.hot.accept('../redux/modules/reducer', () => {
                   instanceStore.registerReducer(

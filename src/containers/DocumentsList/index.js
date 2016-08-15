@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import styles from './index.css';
 import { Link } from 'react-router';
-import * as fromDocuments from '../../redux/modules/reducer';
 import compose from 'recompose/compose';
 import getContext from 'recompose/getContext';
 import lifecycle from 'recompose/lifecycle';
 // import createListeningSagas from '../../helpers/createListeningSagas';
+import styles from './index.css';
+import * as fromDocuments from '../../redux/modules/reducer';
 import { fetchData as fetchDocuments } from '../../redux/modules/documents/index';
 
 const DocumentsList = ({ documents, isLoading, error }) => (
@@ -30,8 +30,7 @@ const DocumentsList = ({ documents, isLoading, error }) => (
           {documents.map((document, index) => (
             <tr key={index}>
               <td>
-                {document.docDate.split('-').reverse().
-                join('.')}
+                {document.docDate.split('-').reverse().join('.')}
               </td>
               <td>
                 <Link to="documentInfo">{document.displayName}</Link>

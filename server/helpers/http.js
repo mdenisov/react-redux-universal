@@ -143,6 +143,7 @@ const httpLog = (() => {
  * @param headers
  * @returns {Promise|function(): Promise}
  */
+ // eslint-disable-next-line
 export const httpGetPromise = ({
   src,
   accept = 'application/json',
@@ -184,68 +185,65 @@ export const httpGetPromise = ({
               reject(err);
             });
           }, parseInt(refreshData[0], 10) * 1000);
-        } else {
-          // Detect a redirect
-          if (res.statusCode > 300 && res.statusCode < 400 && res.headers.location) {
-            const redirectURL = url.parse(res.headers.location);
-            const srcURL = url.parse(src);
-            if (redirectURL.hostname && redirectURL.hostname === srcURL.hostname) {
-              httpGetPromise({ src: res.headers.location, recursion: true }).then(() => {
-                resolve();
-              }).catch((err) => {
-                if (!recursion) {
-                  httpLog(
-                    {
-                      requestURL: src,
-                      requestMethod: 'GET',
-                      responseHeaders: res.headers,
-                      requestHeaders: extHeaders,
-                    },
-                    recursion
-                  );
-                }
-                reject(err);
-              });
-            } else {
-              httpLog(
-                {
-                  requestURL: src,
-                  requestMethod: 'GET',
-                  statusCode: `${res.statusCode} ${res.statusMessage}`,
-                  responseHeaders: res.headers,
-                  requestHeaders: extHeaders,
-                },
-                recursion
-              );
-              reject({
-                res,
-                url: src,
-              });
-            }
-          } else { // Otherwise no redirect; capture the response as normal
-            if (res.statusCode !== 200) {
-              if (result) {
-                result = result.toString('utf8');
+        } else if (res.statusCode > 300 && res.statusCode < 400 && res.headers.location) {
+          const redirectURL = url.parse(res.headers.location);
+          const srcURL = url.parse(src);
+          if (redirectURL.hostname && redirectURL.hostname === srcURL.hostname) {
+            httpGetPromise({ src: res.headers.location, recursion: true }).then(() => {
+              resolve();
+            }).catch((err) => {
+              if (!recursion) {
+                httpLog(
+                  {
+                    requestURL: src,
+                    requestMethod: 'GET',
+                    responseHeaders: res.headers,
+                    requestHeaders: extHeaders,
+                  },
+                  recursion
+                );
               }
-              httpLog(
-                {
-                  requestURL: src,
-                  requestMethod: 'GET',
-                  statusCode: `${res.statusCode} ${res.statusMessage}`,
-                  responseHeaders: res.headers,
-                  responseBody: result,
-                  requestHeaders: extHeaders,
-                },
-                recursion
-              );
-              reject({
-                res,
-                result,
-                url: src,
-              });
-            }
-            resolve(result.toString('utf8'));
+              reject(err);
+            });
+          } else {
+            httpLog(
+              {
+                requestURL: src,
+                requestMethod: 'GET',
+                statusCode: `${res.statusCode} ${res.statusMessage}`,
+                responseHeaders: res.headers,
+                requestHeaders: extHeaders,
+              },
+              recursion
+            );
+            reject({
+              res,
+              url: src,
+            });
           }
+        } else { // Otherwise no redirect; capture the response as normal
+          if (res.statusCode !== 200) {
+            if (result) {
+              result = result.toString('utf8');
+            }
+            httpLog(
+              {
+                requestURL: src,
+                requestMethod: 'GET',
+                statusCode: `${res.statusCode} ${res.statusMessage}`,
+                responseHeaders: res.headers,
+                responseBody: result,
+                requestHeaders: extHeaders,
+              },
+              recursion
+            );
+            reject({
+              res,
+              result,
+              url: src,
+            });
+          }
+          resolve(result.toString('utf8'));
         }
       });
     });

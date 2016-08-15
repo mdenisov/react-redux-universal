@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { END } from 'redux-saga';
 
-export function extendStore(instanceStore, sagaMiddleware) {
+export default function extendStore(instanceStore, sagaMiddleware) {
   const regStrSagaID = '^@{0,2}[a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)*$';
   const regSagaID = new RegExp(regStrSagaID);
   const launchedSagas = {};

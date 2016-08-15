@@ -1,7 +1,7 @@
 import webpack from 'webpack';
-import config from '../../config';
 import fs from 'fs';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
+import config from '../../config';
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');

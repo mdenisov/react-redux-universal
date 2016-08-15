@@ -20,6 +20,7 @@
     "no-script-url" : 0,
     "no-alert": 0,
     "no-underscore-dangle": 0,
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx"] }],
   },
   "plugins": [
     "react", "import"

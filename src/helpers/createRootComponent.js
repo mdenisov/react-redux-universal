@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react';
-import { extendRouter } from '../helpers/router';
-import { extendLocation } from '../helpers/location';
-import RouteTransition from '../components/RouteTransition';
 import { withRouter } from 'react-router';
 import compose from 'recompose/compose';
 import withContext from 'recompose/withContext';
+import { extendRouter } from '../helpers/router';
+import extendLocation from '../helpers/extendLocation';
+import RouteTransition from '../components/RouteTransition';
 
 export default ({
     childContextTypes,

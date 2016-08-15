@@ -1,8 +1,8 @@
-process.env.NODE_ENV = (process.env.NODE_ENV || 'development').trim();
-
 import path from 'path';
 import { argv } from 'yargs';
 import _debug from 'debug';
+
+process.env.NODE_ENV = (process.env.NODE_ENV || 'development').trim();
 
 const debug = _debug('app:config:global');
 const config = new Map();

@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
+import WebpackDevServer from 'webpack-dev-server'; // eslint-disable-line
 import config from '../config';
 import webpackConfig from './webpack/client';
 
