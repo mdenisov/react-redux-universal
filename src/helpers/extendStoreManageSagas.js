@@ -1,5 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { END } from 'redux-saga';
+import { bindActionCreators } from 'redux';
+import sagaFetchData, { fetchData } from './sagaFetchData';
 
 export default function extendStore(instanceStore, sagaMiddleware) {
   const regStrSagaID = '^@{0,2}[a-zA-Z0-9_]+(\\/[a-zA-Z0-9_]+)*$';
@@ -34,5 +36,11 @@ export default function extendStore(instanceStore, sagaMiddleware) {
     }
   };
   instanceStore.getLaunchedSagas = () => Object.assign({}, launchedSagas);
+
+  // Run saga fetch data
+  instanceStore.runSaga(sagaFetchData);
+  // Save action creator for fetch data in instanceStore
+  instanceStore.fetchData = bindActionCreators(fetchData, instanceStore.store.dispatch);
+
   return instanceStore;
 }

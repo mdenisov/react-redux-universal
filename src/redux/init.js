@@ -33,8 +33,8 @@ if (__DEBUG__ && __CLIENT__) {
 
 export default createStoreHelper(createStoreWithMiddleware(createStore),
   _createStore =>
-    (initialState, reducer) => {
-      const instanceStore = _createStore(initialState, reducer);
+    (reducer, initialState) => {
+      const instanceStore = _createStore(reducer, initialState);
       extendStoreManageSagas(instanceStore, sagaMiddleware);
       return instanceStore;
     }

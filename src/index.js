@@ -5,11 +5,9 @@ import { applyRouterMiddleware, Router, match, useRouterHistory } from 'react-ro
 import { Provider } from 'react-redux';
 import { useScroll } from 'react-router-scroll';
 import createHistory from 'history/lib/createBrowserHistory';
-import { bindActionCreators } from 'redux';
 import configureStore from './redux/init';
 import createRoutes from './routes';
 import { deserializeJavascript } from './helpers/redux';
-import sagaFetchData, { fetchData } from './helpers/sagaFetchData';
 
 // check unnecessary re-renders
 if (__DEV__) {
@@ -45,11 +43,8 @@ const createRoutesParams = {
 
 match({ routes: createRoutes(createRoutesParams), history }, () => {
   // Recreate store with initial state from server
-  instanceStore = configureStore(deserializeJavascript(initialState), instanceStore.getReducers());
+  instanceStore = configureStore(instanceStore.getReducers(), deserializeJavascript(initialState));
   createRoutesParams.instanceStore = instanceStore;
-  // Run saga for fetch data
-  instanceStore.runSaga(sagaFetchData);
-  instanceStore.fetchData = bindActionCreators(fetchData, instanceStore.store.dispatch);
 
   // Create router (map routes)
   const routerInst = (

@@ -1,4 +1,3 @@
-import { bindActionCreators } from 'redux';
 import config from '../../../config';
 import { logger } from '../../helpers/logger';
 import renderRoute from './renderRoute';
@@ -6,17 +5,13 @@ import forms from './forms';
 import addDocument from './formsHandlers/addDocument';
 
 const paths = config.get('utils_paths');
-const { matchRoute, configureStore, HttpError, sagaFetchData,
-  fetchData } = require(paths.dist('server'));
+const { matchRoute, configureStore, HttpError } = require(paths.dist('server'));
 
 // ------------------------------------
 // Rendering Middleware
 // ------------------------------------
 export default function* () {
   const instanceStore = configureStore();
-  // Run saga for fetch data
-  instanceStore.runSaga(sagaFetchData);
-  instanceStore.fetchData = bindActionCreators(fetchData, instanceStore.store.dispatch);
   const basename = config.get('project_public_path');
   const apiPath = `${config.get('project_public_path')}${config.get('api_path')}`;
   const fullApiPath = `http://${config.get('server_host')}:${config.get('server_port')}${apiPath}`;

@@ -102,9 +102,16 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
     return enhancer(createStore(createStoreWithMiddleware));
   }
 
-  return (initialState, _reducer) => {
+  return (_reducer, initialState) => {
     let reducers = {};
     let store;
+
+    // Reload reducers
+    const reloadReducers = () => {
+      if (store) {
+        store.replaceReducer(combineReducers(reducers));
+      }
+    };
 
     // Add reducer in store
     const registerReducer = (reducer, replaceReducer = false) => {
@@ -115,9 +122,7 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
         reducers = {};
       }
       Object.assign(reducers, reducer);
-      if (store) {
-        store.replaceReducer(combineReducers(reducers));
-      }
+      reloadReducers();
     };
 
     // Delete reducer from store
@@ -126,9 +131,7 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
         throw new Error('The reducerName should be string');
       }
       delete reducers[reducerName];
-      if (store) {
-        store.replaceReducer(combineReducers(reducers));
-      }
+      reloadReducers();
     };
 
     if (typeof _reducer === 'object' && _reducer !== null && Object.keys(_reducer).length) {
@@ -143,6 +146,7 @@ export const createStore = (createStoreWithMiddleware, enhancer) => {
       store,
       getReducers: () => reducers,
       unRegisterReducer,
+      reloadReducers,
     };
   };
 };
