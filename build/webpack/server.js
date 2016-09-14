@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import fs from 'fs';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
 import config from '../../config';
+import findCacheDir from 'find-cache-dir'; // eslint-disable-line
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
@@ -71,7 +72,7 @@ const webpackConfig = {
         ],
         loader: 'babel',
         query: {
-          cacheDirectory: !!ifProd(),
+          cacheDirectory: ifProd(false, findCacheDir({ name: 'server-bundle' })),
           presets: ['es2015', 'es2016', 'react'],
           plugins: [
             'syntax-async-functions',

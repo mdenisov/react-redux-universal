@@ -6,6 +6,7 @@ import postcssFocus from 'postcss-focus';
 import postcssReporter from 'postcss-reporter';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
 import config from '../../config';
+import findCacheDir from 'find-cache-dir'; // eslint-disable-line
 
 const paths = config.get('utils_paths');
 const globals = config.get('globals');
@@ -123,7 +124,7 @@ const webpackConfig = {
         include: paths.project(config.get('dir_src')),
         loader: 'babel',
         query: {
-          cacheDirectory: !ifProd(),
+          cacheDirectory: ifProd(false, findCacheDir({ name: 'client-bundle' })),
           presets: ['es2015', 'es2016', 'react'],
           plugins: [
             'syntax-async-functions',

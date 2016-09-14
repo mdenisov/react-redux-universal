@@ -125,6 +125,7 @@
     "yargs": "^4.7.1"
   },
   "devDependencies": {
+    "find-cache-dir": "^0.1.1",
     "piping": "^0.3.2",
     "react-addons-perf": "^15.3.1",
     "react-transform-catch-errors": "^1.0.2",
