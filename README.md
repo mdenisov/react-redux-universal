@@ -80,7 +80,7 @@ Great, now that introductions have been made here's everything in full detail:
 * `npm run lint:js` - Run ESLint check your JS source code.
 * `npm run lint:js:fix` - Run ESLint with option for automatically fix problems in your JS source code.
 * `npm run lint:css` - Run StyleLint check your CSS code.
-* `npm run flow` - Run Flow for static type checks your source code.
+* `npm run flow` - Run Flow for static type checks your JS source code.
 
 **NOTE:** Koa host and port defined by env variables `NODE_HOST` and `NODE_PORT` in `package.json`. `webpack-dev-server` is launched on the same host as koa.
 Project path defined by env variable 'PROJECT_PATH' and empty by default (http://localhost:4000/PROJECT_PATH/root_route/...).

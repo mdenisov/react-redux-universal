@@ -2,7 +2,7 @@
 import { compose, createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import reduxThunk from 'redux-thunk';
-import { createStore as createStoreHelper } from '../helpers/redux';
+import createStoreHelper from '../helpers/createStore';
 import extendStoreManageSagas from '../helpers/extendStoreManageSagas';
 
 const middlewares = [reduxThunk];

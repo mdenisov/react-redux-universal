@@ -11,6 +11,9 @@ import { deserializeJavascript } from './helpers/redux';
 
 // check unnecessary re-renders
 if (__DEV__) {
+  const Perf = require('react-addons-perf'); //eslint-disable-line
+  window.Perf = Perf;
+
   // eslint-disable-next-line
   require('why-did-you-update').default(
     React,

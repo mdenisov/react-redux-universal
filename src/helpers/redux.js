@@ -1,5 +1,3 @@
-import { combineReducers } from 'redux';
-
 export const createReducer = (initialState, reducerMap) => {
   if (typeof reducerMap !== 'object' || reducerMap === null) {
     throw new Error('Reducer map isn\'t valid');
@@ -93,60 +91,3 @@ export function mapFromJS(source) {
   }
   return result;
 }
-
-export const createStore = (createStoreWithMiddleware, enhancer) => {
-  if (typeof enhancer !== 'undefined') {
-    if (typeof enhancer !== 'function') {
-      throw new Error('Expected the enhancer to be a function.');
-    }
-    return enhancer(createStore(createStoreWithMiddleware));
-  }
-
-  return (_reducer, initialState) => {
-    let reducers = {};
-    let store;
-
-    // Reload reducers
-    const reloadReducers = () => {
-      if (store) {
-        store.replaceReducer(combineReducers(reducers));
-      }
-    };
-
-    // Add reducer in store
-    const registerReducer = (reducer, replaceReducer = false) => {
-      if (reducer === null || typeof reducer !== 'object' || Object.keys(reducer).length === 0) {
-        throw new Error('The reducer shall be non empty object');
-      }
-      if (replaceReducer) {
-        reducers = {};
-      }
-      Object.assign(reducers, reducer);
-      reloadReducers();
-    };
-
-    // Delete reducer from store
-    const unRegisterReducer = reducerName => {
-      if (typeof reducerName !== 'string') {
-        throw new Error('The reducerName should be string');
-      }
-      delete reducers[reducerName];
-      reloadReducers();
-    };
-
-    if (typeof _reducer === 'object' && _reducer !== null && Object.keys(_reducer).length) {
-      registerReducer(_reducer);
-      store = createStoreWithMiddleware(combineReducers(reducers), initialState);
-    } else {
-      store = createStoreWithMiddleware(() => ({}));
-    }
-
-    return {
-      registerReducer,
-      store,
-      getReducers: () => reducers,
-      unRegisterReducer,
-      reloadReducers,
-    };
-  };
-};
