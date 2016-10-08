@@ -32,3 +32,7 @@ export const matchRoute = ({ requestUrl, createRoutesParams, basename }) =>
       }
     });
   });
+
+if (__HMR__ && module.hot) {
+  module.hot.accept();
+}

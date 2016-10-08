@@ -5,7 +5,7 @@ const FETCH_DATA = '@@APP/FETCH_DATA';
 
 const checkAction = (action, actionName) => {
   if (typeof action !== 'function') {
-    throw new Error(`${actionName} shall be actionCreator`);
+    throw new Error(`${actionName} must be actionCreator`);
   }
 };
 

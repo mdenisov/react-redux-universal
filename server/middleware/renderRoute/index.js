@@ -5,7 +5,7 @@ import forms from './forms';
 import addDocument from './formsHandlers/addDocument';
 
 const paths = config.get('utils_paths');
-const { matchRoute, configureStore, HttpError } = require(paths.dist('server'));
+const { matchRoute, configureStore, HttpError } = require(paths.dist());
 
 // ------------------------------------
 // Rendering Middleware

@@ -29,13 +29,6 @@ export default (params) => {
               instanceStore.registerReducer(
                 require('../redux/modules/reducer').default,
               ); // eslint-disable-line
-              if (__HMR__ && module.hot) { // Hot reloading reducer
-                module.hot.accept('../redux/modules/reducer', () => {
-                  instanceStore.registerReducer(
-                    require('../redux/modules/reducer').default
-                  );
-                });
-              }
 
               callback(null, require('../containers/DocumentsList').default);
             });

@@ -37,11 +37,11 @@ const createStore = (createStoreWithMiddleware, enhancer) => {
     // Add reducer in store
     const registerReducer = (reducer, replaceReducer = false) => {
       if (reducer === null || !isPlainObject(reducer) || Object.keys(reducer).length === 0) {
-        throw new Error('The reducer shall be non empty object');
+        throw new Error('The reducer must be non empty object');
       }
       Object.keys(reducer).forEach(key => {
         if (typeof reducer[key] !== 'function' && !isPlainObject(reducer[key])) {
-          throw new Error('Properties of reducer shall be functions or objects');
+          throw new Error('Properties of reducer must be functions or objects');
         }
       });
       if (replaceReducer) {
@@ -61,7 +61,7 @@ const createStore = (createStoreWithMiddleware, enhancer) => {
     // Delete reducer from store
     const unRegisterReducer = (reducer) => {
       if (typeof reducer !== 'string' && !isPlainObject(reducer)) {
-        throw new Error('The reducer shall be string or object');
+        throw new Error('The reducer must be string or object');
       }
       let needReload = false;
       if (typeof reducer === 'string' && rawReducers[reducer]) {

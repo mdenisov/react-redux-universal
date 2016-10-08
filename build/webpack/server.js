@@ -8,18 +8,20 @@ const paths = config.get('utils_paths');
 const globals = config.get('globals');
 
 const removeEmpty = (obj) => obj.filter(el => !!el);
+const ifHot = (el = true, defEl) => (globals.__HMR__ ? el : defEl);
 const ifProd = (el = true, defEl) => (globals.__PROD__ ? el : defEl);
 
 const webpackConfig = {
   name: 'server',
   target: 'node',
   bail: !!ifProd(),
-  entry: {
-    app: paths.server('app'),
-  },
+  entry: removeEmpty([
+    ifHot('webpack/hot/poll?1000'),
+    paths.server('app'),
+  ]),
   externals: fs.readdirSync('node_modules').filter(module => module !== '.bin'),
   output: {
-    path: paths.dist('server'),
+    path: paths.dist(),
     libraryTarget: 'commonjs2',
     filename: 'index.js',
     pathinfo: true,
@@ -33,6 +35,7 @@ const webpackConfig = {
     new webpack.ProvidePlugin({
       fetch: 'node-fetch',
     }),
+    ifHot(new webpack.HotModuleReplacementPlugin()),
     new StyleLintPlugin({
       configFile: '.stylelintrc',
       context: paths.src(),
@@ -89,6 +92,12 @@ const webpackConfig = {
             }],
           ],
           env: {
+            development: {
+              plugins: [
+                'transform-react-jsx-source',
+                'transform-react-jsx-self',
+              ],
+            },
             production: {
               plugins: [
                 'transform-react-remove-prop-types',

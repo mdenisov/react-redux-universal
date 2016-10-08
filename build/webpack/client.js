@@ -155,6 +155,8 @@ const webpackConfig = {
                   // but you can tell the plugin to look for different component factories:
                   // factoryMethods: ["React.createClass", "createClass"]
                 }],
+                'transform-react-jsx-source',
+                'transform-react-jsx-self',
               ],
             },
             production: {
@@ -183,7 +185,12 @@ const webpackConfig = {
   postcss: [
     postcssFocus(), // Add a :focus to every :hover
     cssnext({ // Allow future CSS features to be used, also auto-prefixes the CSS...
-      browsers: ['last 2 versions', 'IE >= 9'], // ...based on this browser list
+      browsers: [
+        '>1%',
+        'last 4 versions',
+        'Firefox ESR',
+        'not ie < 9',
+      ], // ...based on this browser list
     }),
     postcssReporter({ // Posts messages from plugins to the terminal
       clearMessages: true,
