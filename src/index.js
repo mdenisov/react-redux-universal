@@ -49,20 +49,43 @@ match({ routes: createRoutes(createRoutesParams), history }, () => {
   instanceStore = configureStore(instanceStore.getReducers(), deserializeJavascript(initialState));
   createRoutesParams.instanceStore = instanceStore;
 
-  // Create router (map routes)
-  const routerInst = (
-    <Router history={history} render={applyRouterMiddleware(useScroll())}>
-      {createRoutes(createRoutesParams)}
-    </Router>
-  );
+  const render = (_createRoutes) => {
+    let createRoutes1;
+    if (_createRoutes) {
+      createRoutes1 = _createRoutes;
+    } else {
+      createRoutes1 = require('./routes/index').default;
+    }
 
-  const node = (
-    <Provider store={instanceStore.store}>
-      {routerInst}
-    </Provider>
-  );
+    const node = (
+      <Provider store={instanceStore.store}>
+        <Router history={history} render={applyRouterMiddleware(useScroll())}>
+          {createRoutes1(createRoutesParams)}
+        </Router>
+      </Provider>
+    );
 
-  ReactDOM.render(node, target);
+    ReactDOM.render(node, target);
+  };
+
+  if (__HMR__ && module.hot) {
+    // Setup hot module replacement
+    module.hot.accept('./routes/index', () => {
+      setImmediate(() => {
+        ReactDOM.unmountComponentAtNode(target);
+        try {
+          render();
+        } catch (err) {
+          const RedBox = require('redbox-react').default; // eslint-disable-line
+          ReactDOM.render(<RedBox error={err} />, target);
+        }
+      });
+    });
+
+    /* module.hot.accept(['./redux/init', './helpers/redux'], () => {});*/
+  }
+
+  render(createRoutes);
 
   if (__DEBUG__ && !window.devToolsExtension) {
     // Enable Redux dev tools in DEBUG mode

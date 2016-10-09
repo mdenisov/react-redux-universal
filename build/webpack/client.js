@@ -125,7 +125,7 @@ const webpackConfig = {
         loader: 'babel',
         query: {
           cacheDirectory: ifProd(false, findCacheDir({ name: 'client-bundle' })),
-          presets: ['es2015', 'es2016', 'react'],
+          presets: ['latest', 'react'],
           plugins: [
             'syntax-async-functions',
             'syntax-export-extensions',
@@ -138,23 +138,6 @@ const webpackConfig = {
           env: {
             development: {
               plugins: [
-                ['react-transform', {
-                  transforms: removeEmpty([
-                    ifHot({
-                      transform: 'react-transform-hmr',
-                      // see transform docs for "imports" and "locals" dependencies
-                      imports: ['react'],
-                      locals: ['module'],
-                    }),
-                    {
-                      transform: 'react-transform-catch-errors',
-                      imports: ['react', 'redbox-react'],
-                    },
-                  ]),
-                  // by default we only look for `React.createClass` (and ES6 classes)
-                  // but you can tell the plugin to look for different component factories:
-                  // factoryMethods: ["React.createClass", "createClass"]
-                }],
                 'transform-react-jsx-source',
                 'transform-react-jsx-self',
               ],

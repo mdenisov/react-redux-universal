@@ -11,6 +11,8 @@ const removeEmpty = (obj) => obj.filter(el => !!el);
 const ifHot = (el = true, defEl) => (globals.__HMR__ ? el : defEl);
 const ifProd = (el = true, defEl) => (globals.__PROD__ ? el : defEl);
 
+const nodeModules = fs.readdirSync('node_modules').filter(n => n !== 'webpack');
+
 const webpackConfig = {
   name: 'server',
   target: 'node',
@@ -19,7 +21,13 @@ const webpackConfig = {
     ifHot('webpack/hot/poll?1000'),
     paths.server('app'),
   ]),
-  externals: fs.readdirSync('node_modules').filter(module => module !== '.bin'),
+  externals: (context, request, callback) => {
+    if (nodeModules.some(dir => request.indexOf(`${dir}/`) === 0 || request === dir)) {
+      callback(null, `commonjs ${request}`);
+    } else {
+      callback();
+    }
+  },
   output: {
     path: paths.dist(),
     libraryTarget: 'commonjs2',
@@ -76,7 +84,7 @@ const webpackConfig = {
         loader: 'babel',
         query: {
           cacheDirectory: ifProd(false, findCacheDir({ name: 'server-bundle' })),
-          presets: ['es2015', 'es2016', 'react'],
+          presets: ['latest', 'react'],
           plugins: [
             'syntax-async-functions',
             'syntax-export-extensions',
