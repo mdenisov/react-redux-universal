@@ -41,7 +41,6 @@
     "babel-core": "^6.9.0",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.4",
-    "babel-plugin-react-transform": "^2.0.2",
     "babel-plugin-syntax-async-functions": "^6.3.13",
     "babel-plugin-syntax-export-extensions": "^6.3.13",
     "babel-plugin-syntax-trailing-function-commas": "^6.8.0",

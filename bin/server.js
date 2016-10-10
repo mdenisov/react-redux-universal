@@ -22,7 +22,7 @@ const config = require('../config').default;
 
 if (config.get('globals').__DEV__) {
   const ignore = new RegExp(
-    `(\/\.|~$|\.json|^${config.get('path_project').replace('/', '\\/')}\/dist\/[^\/]+\.js$)`, 'i');
+    `(\\/\\.|~$|\\.json$|^${config.get('path_project').replace('/', '\\/')}\\/dist\\/)`, 'i');
   if (!require('piping')({ // eslint-disable-line
     hook: true,
     ignore,
